@@ -35,7 +35,7 @@ titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
@@ -72,3 +72,18 @@ deploy:
   type: git
   repository: git@github.com:ctLiu3/ctliu3.github.com.git
   branch: master
+
+# # Plugins
+# plugins:
+ # - hexo-math
+# math:
+  # engine: 'mathjax' # or 'katex'
+  # mathjax:
+    # src: custom_mathjax_source
+    # config:
+      # # MathJax config
+  # katex:
+    # css: custom_css_source
+    # js: custom_js_source # not used
+    # config:
+      # # KaTeX config
