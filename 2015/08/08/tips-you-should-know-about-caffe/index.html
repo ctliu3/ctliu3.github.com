@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Tips you should know about Caffe - ct.Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Caffe is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around on">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tips you should know about Caffe">
+<meta property="og:url" content="http://ctliu3.com/2015/08/08/tips-you-should-know-about-caffe/index.html">
+<meta property="og:site_name" content="ct.Liu">
+<meta property="og:description" content="Caffe is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around on">
+<meta property="og:updated_time" content="2016-09-04T14:04:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tips you should know about Caffe">
+<meta name="twitter:description" content="Caffe is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around on">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+</head>
+
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ctliu3.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-tips-you-should-know-about-caffe" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Tips you should know about Caffe
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/08/08/tips-you-should-know-about-caffe/" class="article-date">
+  <time datetime="2015-08-08T08:49:18.000Z" itemprop="datePublished">2015-08-08</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://github.com/BVLC/caffe" target="_blank" rel="external">Caffe</a> is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around one week, so I&#x2019;m also a newbie. I encounter some &#x201C;pits&#x201D; when using Caffe. So I write down some tips, hope they are helpful to you.</p>
+<a id="more"></a>
+<h3 id="What-Caffe-can-do"><a href="#What-Caffe-can-do" class="headerlink" title="What Caffe can do?"></a>What Caffe can do?</h3><p>Caffe is actually a feature learning tool, you can do some specific tasks like classification, clustering, segmentation with the help of it. You can define the structure of the network to train the model of your own. Otherwise, some pre-trained models, including <a href="https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet" target="_blank" rel="external">googlenet</a>, <a href="https://github.com/BVLC/caffe/tree/master/models/bvlc_reference_caffenet" target="_blank" rel="external">caffenet</a>, are provided, they can be used directly. </p>
+<h3 id="Read-the-source-code"><a href="#Read-the-source-code" class="headerlink" title="Read the source code"></a>Read the source code</h3><p>In some degree, Caffe is really a blackbox. Therefore, if you first time meet it, you may want to dig into the source code to see the scenery behind Caffe. Knowing the following modules, which are described in a high level, will make your travel easier.</p>
+<ul>
+<li><a href="https://github.com/BVLC/caffe/blob/master/src/caffe/blob.cpp" target="_blank" rel="external">Blob</a>. The data that flows up and down in the deep learning network is wrapped by Blob class. Blob is a 4-dimensional (4D) data and it contains different kinds of information when it is in different positions in the net. For the input, the shape of data is <code>#image x #channel x height x width</code>. For the output, it is <code>#image x #class x 1 x 1</code>. Thus, you can compare the <code>#class</code> predictions and choose the maximal value to get which class each image belongs to.</li>
+<li><a href="https://github.com/BVLC/caffe/blob/master/src/caffe/net.cpp" target="_blank" rel="external">Net</a>. This module describes the DL net. You will find many variables in the <a href="https://github.com/BVLC/caffe/blob/master/src/caffe/net.cpp" target="_blank" rel="external">net.cpp</a>, but don&#x2019;t be dismay, many of them are used to keep the structure of DL net. Think about how you construct a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph" target="_blank" rel="external">circled acyclic graph</a> (DAG) in C++. It&#x2019;s almost the same. But you do really need to know the input and output data of the net, as described above.</li>
+<li><a href="https://github.com/BVLC/caffe/blob/master/src/caffe/layer_factory.cpp" target="_blank" rel="external">Layer</a>. This is a significant module in Caffe. One thing you need to know is, for a layer, there may be more than one layers under it and more than one layer above it. That&#x2019;s it. If you are not a researcher, you can skip this amount of implements of different layers, which make one petrified. But I do recommend you should understand the function of each layer by their layer types.</li>
+</ul>
+<p>Caffe uses <a href="https://developers.google.com/protocol-buffers/" target="_blank" rel="external">protocol buffer</a> to define the data format, so reading the <a href="https://github.com/BVLC/caffe/blob/master/src/caffe/proto/caffe.proto" target="_blank" rel="external">caffe.proto</a> file will be your first step before reading other parts of the source code.</p>
+<h3 id="Obtain-the-features-extracted-by-DL-net"><a href="#Obtain-the-features-extracted-by-DL-net" class="headerlink" title="Obtain the features extracted by DL net"></a>Obtain the features extracted by DL net</h3><p>Since DL net is a multiple layers network, you can extract the features generated in some layers to do the future task, such as clustering. Although you can extract any layer in the network, usually the last layer before output is a better option. The extracted features are stored in <code>leveldb</code> or <code>lmdb</code> format and you need to write code to obtain the plain data of feature data. There is a simple script written in python.</p>
+<pre>
+import lmdb
+from caffe.proto import caffe_pb2
+
+def save2txt(db_name):
+    img_db = lmdb.open(db_name)
+    txn = img_db.begin()
+    cursor = txn.cursor()
+    cursor.iternext()
+
+    datum = caffe_pb2.Datum()
+    for key, value in cursor:
+        datum.ParseFromString(value)
+        data = caffe.io.datum_to_array(datum)
+        data = np.reshape(data, (1, np.product(data.shape)))[0]
+       // data is the feature with shape (#feat, ) 
+       // Your code.
+</pre>
+
+<h3 id="What&#x2019;s-more"><a href="#What&#x2019;s-more" class="headerlink" title="What&#x2019;s more"></a>What&#x2019;s more</h3><p>During the usage of Caffe, you need to do lots of trivial work, like putting the data in certain directory, checking the output of each step is whether correct or not, or sometimes you need to visualize the output data in website in that you probably work on the remote machine, etc.<br>In light of this, being familiar with <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)" target="_blank" rel="external">bash/sh</a>, <a href="https://www.python.org" target="_blank" rel="external">python</a> or <a href="https://www.ruby-lang.org/zh_cn/" target="_blank" rel="external">ruby</a> will greatly improve your working efficiency. You can check my <a href="https://gist.github.com/ctliu3/fc1148da3922cff09eb7" target="_blank" rel="external">code snippet</a> in github for fast learning of bash.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Caffe/">Caffe</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DL/">DL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ML/">ML</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/09/04/high-performance-image-prediction-service/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Build a high performance image prediction service
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/04/05/nlp-pa-parsing/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">NLP PA: Parsing&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 ctliu3&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+<script>
+  var disqus_shortname = 'ctliu3';
+  
+  var disqus_url = 'http://ctliu3.com/2015/08/08/tips-you-should-know-about-caffe/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
   
   <title>ct.Liu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -17,13 +17,13 @@
   
   <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
   <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 </head>
 
 <body>
-  <div id="container">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
     <header id="header">
   <div id="header-outer" class="outer">
     <div id="header-inner" class="inner">
@@ -53,7 +53,7 @@
   </div>
 </header>
     <section id="main" class="outer">
-      <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-high-performance-image-prediction-service" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -61,34 +61,192 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/09/04/hello-world/">Hello World</a>
+      <a class="article-title" href="/2016/09/04/high-performance-image-prediction-service/">Build a high performance image prediction service</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2016/09/04/hello-world/" class="article-date">
-  <time datetime="2016-09-04T00:51:12.000Z" itemprop="datePublished">2016-09-04</time>
+      <a href="/2016/09/04/high-performance-image-prediction-service/" class="article-date">
+  <time datetime="2016-09-04T14:36:00.000Z" itemprop="datePublished">2016-09-04</time>
 </a>
       
       
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
+        <p>Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&#x2019;ve  spent some time building the image classification service and done some optimizations during my work.  I will share some of my experience in this article.</p>
+        
+          <p class="article-more-link">
+            <a href="/2016/09/04/high-performance-image-prediction-service/#more">Read More</a>
+          </p>
+        
       
     </div>
     
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+    
+      <article id="post-tips-you-should-know-about-caffe" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/08/08/tips-you-should-know-about-caffe/">Tips you should know about Caffe</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/08/08/tips-you-should-know-about-caffe/" class="article-date">
+  <time datetime="2015-08-08T08:49:18.000Z" itemprop="datePublished">2015-08-08</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://github.com/BVLC/caffe">Caffe</a> is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around one week, so I&#x2019;m also a newbie. I encounter some &#x201C;pits&#x201D; when using Caffe. So I write down some tips, hope they are helpful to you.</p>
+        
+          <p class="article-more-link">
+            <a href="/2015/08/08/tips-you-should-know-about-caffe/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Caffe/">Caffe</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DL/">DL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ML/">ML</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+    
+      <article id="post-nlp-pa-parsing" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/04/05/nlp-pa-parsing/">NLP PA: Parsing</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2013/04/05/nlp-pa-parsing/" class="article-date">
+  <time datetime="2013-04-05T05:57:15.000Z" itemprop="datePublished">2013-04-05</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NLP/">NLP</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>&#x672C;&#x5468;&#x7684; PA &#x662F;&#x5BF9;&#x7ED9;&#x5B9A;&#x7684;&#x53E5;&#x5B50;&#x6C42;&#x51FA;&#x76F8;&#x5E94;&#x7684;&#x53E5;&#x6CD5;&#x6811;&#xFF08;Parsing tree&#xFF09;&#x3002;&#x5B9E;&#x9645;&#x4E0A;&#xFF0C;Parsing &#x7ECF;&#x5E38;&#x4E5F;&#x505A;&#x4E3A;&#x4E00;&#x4E9B;&#x5B9E;&#x9645;&#x5E94;&#x7528;&#x7684;&#x9884;&#x5904;&#x7406;&#xFF0C;&#x6BD4;&#x5982;&#x673A;&#x5668;&#x7FFB;&#x8BD1;&#xFF08;Machine Translation, MT&#xFF09;&#xFF0C;&#x56E0;&#x4E3A;&#x4E0D;&#x540C;&#x8BED;&#x8A00;&#x7684;&#x53E5;&#x5B50;&#x7ED3;&#x6784;&#xFF08;&#x5982;&#x4E3B;&#x8C13;&#x5BBE;&#xFF09;&#x6709;&#x5F88;&#x5927;&#x7684;&#x533A;&#x522B;&#xFF0C;&#x901A;&#x8FC7;&#x53E5;&#x6CD5;&#x5206;&#x6790;&#x5F97;&#x5230;&#x53E5;&#x5B50;&#x7684;&#x7ED3;&#x6784;&#x53CA;&#x5355;&#x8BCD;&#x8BCD;&#x6027;&#xFF0C;&#x518D;&#x6839;&#x636E;&#x4E0D;&#x540C;&#x8BED;&#x8A00;&#x672C;&#x8EAB;&#x7684;&#x53E5;&#x6CD5;&#x7279;&#x70B9;&#x8FDB;&#x884C;&#x53D8;&#x6362;&#x3002;</p>
+        
+          <p class="article-more-link">
+            <a href="/2013/04/05/nlp-pa-parsing/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/coursera/">coursera</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nlp/">nlp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prasing/">prasing</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+    
+      <article id="post-nlp-pa-hidden-markov-models" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/03/24/nlp-pa-hidden-markov-models/">NLP PA: Hidden Markov Models</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2013/03/24/nlp-pa-hidden-markov-models/" class="article-date">
+  <time datetime="2013-03-24T05:27:49.000Z" itemprop="datePublished">2013-03-24</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NLP/">NLP</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://class.coursera.org/nlangp-001/class/index" title="NLP">&#x4F20;&#x9001;&#x95E8;</a> </p>
+<p>HMM &#x662F;&#x901A;&#x8FC7;&#x9884;&#x6D4B;&#x4E00;&#x8FDE;&#x4E32;&#x7684; $y_i$ &#x6765;&#x5F97;&#x5230;&#x6A21;&#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &#x7684;&#x6982;&#x7387;&#x6700;&#x5927;&#x503C;&#x3002;&#x672C;&#x5468;&#x7684; Programming &#x4E3B;&#x8981;&#x662F;&#x5229;&#x7528; HMM &#x6765;&#x505A;&#x9488;&#x5BF9;&#x53E5;&#x5B50;&#x7684;&#x8BCD;&#x6027; tagger&#x3002;</p>
+        
+          <p class="article-more-link">
+            <a href="/2013/03/24/nlp-pa-hidden-markov-models/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/coursera/">coursera</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hmm/">hmm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nlp/">nlp</a></li></ul>
+
+      </footer>
     
   </div>
   
@@ -112,6 +270,18 @@
   </div>
 </footer>
     
+<script>
+  var disqus_shortname = 'ctliu3';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
 
 <script src="/js/jquery.min.js"></script>
 
@@ -121,6 +291,23 @@
 
 
 <script src="/js/script.js"></script>
-  </div>
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
 </body>
 </html>

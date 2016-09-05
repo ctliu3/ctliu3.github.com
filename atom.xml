@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ct.Liu</title>
+  <subtitle>25 hours</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://ctliu3.com/"/>
+  <updated>2016-09-04T15:26:46.000Z</updated>
+  <id>http://ctliu3.com/</id>
+  
+  <author>
+    <name>ctliu3</name>
+    <email>lcndn3@gmail.com</email>
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Build a high performance image prediction service</title>
+    <link href="http://ctliu3.com/2016/09/04/high-performance-image-prediction-service/"/>
+    <id>http://ctliu3.com/2016/09/04/high-performance-image-prediction-service/</id>
+    <published>2016-09-04T14:36:00.000Z</published>
+    <updated>2016-09-04T15:26:46.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&#x2019;ve  spent some time building the image classification service and done some optimizations during my work.  I will share some of my experience in this article.</p>
+<a id="more"></a>
+<h3 id="CPU-or-GPU"><a href="#CPU-or-GPU" class="headerlink" title="CPU or GPU"></a>CPU or GPU</h3><p>It really depends on a variety of factors, such as the request scale, power consumption, etc. GPU is expensive, but running the forward phase on the GPU device has dozens of times speed-up than CPU even you use OpenBLAS or MKL to accelerate the underlying matrix manipulation in CPU.</p>
+<h3 id="Prediction-Model-design"><a href="#Prediction-Model-design" class="headerlink" title="Prediction Model design"></a>Prediction Model design</h3><p>In general case, people will try to predict the image category using convolutional neural networks (CNN), like AlexNet, GoogleNet, or VGGNet. Different networks has different prediction performance and time complexity in inference phase. For example, executing forward stage in AlexNet is 4 times faster than GoogleNet. But GoogleNet has better classification ability since it&#x2019;s deeper and wider. Directly training the pre-trained model on the ImageNet or some other open database might not meet your need for precision and recall. To gain a higher precision and recall, there are many approaches worth to try: re-design the network, use the cascaded model, integrate the outputs of multi-network, predict with multiple scales. All these strategies are doable and sound great. But remember, these designs might more or less increase the time and GPU memory cost. So, take the time and space complexity into account while designing the neural network models.</p>
+<h3 id="Prediction-Frameworks"><a href="#Prediction-Frameworks" class="headerlink" title="Prediction Frameworks"></a>Prediction Frameworks</h3><p>Building an neural network prediction framework from scratch of you own might not a smart idea since there are some well-built projects such as Caffe, MXNet and TensorFlow, which can be deployed directly in the production environment. Take following pros and cons into account before choosing one.</p>
+<ul>
+<li>Caffe. Maybe this is the most popular framework that people are familiar with, which means you can find lots of solutions for the problem you encounter on the Internet. Caffe has graceful C++ and python API. The cons is that it occupies too much GPU memory when comparing with MXNet and TensorFlow. This is the design issue. Caffe will allocate the memory for parameters and output of each layer and these memory can not be reused. For GoogleNet model, Caffe allocates 6x GPU memory than MXNet. The good news is that if you want to load multiple identical models on the same process, you can share the parameters of each layer.</li>
+<li>MXNet. A deep learning that has a better design of GPU memory allocation. It constructs the neural network as a computation graph. Each node in the graph can be reuse and it has high performance since the computation is not executed layer-by-layer, but based on the node (a node is a computation unit like add, minus, multiply and divide). Concretely, a node can be executed if its preceding nodes are finished. Like Caffe, MXNet also has graceful C++ and python API. The bad news is MXNet has worse performance when running on CPU. Take a look of this issue.</li>
+<li>TensorFlow. The GPU memory usage and performance are close to MXNet. I don&#x2019;t have experience on TensorFlow on production environment. The official team provides a project, called serving, to help deploy deep learning models.</li>
+</ul>
+<h3 id="Single-or-Batch-prediction"><a href="#Single-or-Batch-prediction" class="headerlink" title="Single or Batch prediction"></a>Single or Batch prediction</h3><p>Running a GoogleNet V1 in forward (with cuDNN) with the batch size of 10 is only~30% time of running batch size of 1 in 10 times. This conclusion provides us a way to improve the service performance. We can add a middleware to serve the request from client and forward them to prediction service. There are some features for the middleware showing as followings:</p>
+<ul>
+<li>Request coalescing duration. The middleware needs to forward the batched images within a limited period of time even the requested imaged to be predicted is smaller than the batch size. If not, it brings high-latency. </li>
+<li>Batch size. In general, the throughput of the prediction system will be enhanced if batch size increased. But too larger a batch size leads to high GPU memory occupation and service latency.</li>
+<li>Rate limiting. The middleware can limit the number of request to fit the service limitation of prediction service.</li>
+</ul>
+<p>Following figure a flexible and extensible architecture.</p>
+<img src="/2016/09/04/high-performance-image-prediction-service/prediction-flow.png" class="full-image" width="350" height="680" title="prediction-flow">
+<h3 id="Image-decode-optimization"><a href="#Image-decode-optimization" class="headerlink" title="Image decode optimization"></a>Image decode optimization</h3><p>Decode a 1080P image will cost ~30ms in CPU while running inference of GoogleNet V1 only cost ~10ms in GPU. Thus, decoding image may somehow become bottleneck. To solve this, It&#x2019;s better to resize the image in front end. In addition, decoding image with in libjpeg-turbo library ~30% faster than libjpeg (I got this result but the official site claims that better performance can be achieved).</p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>The strategies above mentioned are not only suitable for image prediction service, but also for face recognition, face detection, etc.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&amp;#x2019;ve  spent some time building the image classification service and done some optimizations during my work.  I will share some of my experience in this article.&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Tips you should know about Caffe</title>
+    <link href="http://ctliu3.com/2015/08/08/tips-you-should-know-about-caffe/"/>
+    <id>http://ctliu3.com/2015/08/08/tips-you-should-know-about-caffe/</id>
+    <published>2015-08-08T08:49:18.000Z</published>
+    <updated>2016-09-04T14:04:45.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://github.com/BVLC/caffe" target="_blank" rel="external">Caffe</a> is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around one week, so I&#x2019;m also a newbie. I encounter some &#x201C;pits&#x201D; when using Caffe. So I write down some tips, hope they are helpful to you.</p>
+<a id="more"></a>
+<h3 id="What-Caffe-can-do"><a href="#What-Caffe-can-do" class="headerlink" title="What Caffe can do?"></a>What Caffe can do?</h3><p>Caffe is actually a feature learning tool, you can do some specific tasks like classification, clustering, segmentation with the help of it. You can define the structure of the network to train the model of your own. Otherwise, some pre-trained models, including <a href="https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet" target="_blank" rel="external">googlenet</a>, <a href="https://github.com/BVLC/caffe/tree/master/models/bvlc_reference_caffenet" target="_blank" rel="external">caffenet</a>, are provided, they can be used directly. </p>
+<h3 id="Read-the-source-code"><a href="#Read-the-source-code" class="headerlink" title="Read the source code"></a>Read the source code</h3><p>In some degree, Caffe is really a blackbox. Therefore, if you first time meet it, you may want to dig into the source code to see the scenery behind Caffe. Knowing the following modules, which are described in a high level, will make your travel easier.</p>
+<ul>
+<li><a href="https://github.com/BVLC/caffe/blob/master/src/caffe/blob.cpp" target="_blank" rel="external">Blob</a>. The data that flows up and down in the deep learning network is wrapped by Blob class. Blob is a 4-dimensional (4D) data and it contains different kinds of information when it is in different positions in the net. For the input, the shape of data is <code>#image x #channel x height x width</code>. For the output, it is <code>#image x #class x 1 x 1</code>. Thus, you can compare the <code>#class</code> predictions and choose the maximal value to get which class each image belongs to.</li>
+<li><a href="https://github.com/BVLC/caffe/blob/master/src/caffe/net.cpp" target="_blank" rel="external">Net</a>. This module describes the DL net. You will find many variables in the <a href="https://github.com/BVLC/caffe/blob/master/src/caffe/net.cpp" target="_blank" rel="external">net.cpp</a>, but don&#x2019;t be dismay, many of them are used to keep the structure of DL net. Think about how you construct a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph" target="_blank" rel="external">circled acyclic graph</a> (DAG) in C++. It&#x2019;s almost the same. But you do really need to know the input and output data of the net, as described above.</li>
+<li><a href="https://github.com/BVLC/caffe/blob/master/src/caffe/layer_factory.cpp" target="_blank" rel="external">Layer</a>. This is a significant module in Caffe. One thing you need to know is, for a layer, there may be more than one layers under it and more than one layer above it. That&#x2019;s it. If you are not a researcher, you can skip this amount of implements of different layers, which make one petrified. But I do recommend you should understand the function of each layer by their layer types.</li>
+</ul>
+<p>Caffe uses <a href="https://developers.google.com/protocol-buffers/" target="_blank" rel="external">protocol buffer</a> to define the data format, so reading the <a href="https://github.com/BVLC/caffe/blob/master/src/caffe/proto/caffe.proto" target="_blank" rel="external">caffe.proto</a> file will be your first step before reading other parts of the source code.</p>
+<h3 id="Obtain-the-features-extracted-by-DL-net"><a href="#Obtain-the-features-extracted-by-DL-net" class="headerlink" title="Obtain the features extracted by DL net"></a>Obtain the features extracted by DL net</h3><p>Since DL net is a multiple layers network, you can extract the features generated in some layers to do the future task, such as clustering. Although you can extract any layer in the network, usually the last layer before output is a better option. The extracted features are stored in <code>leveldb</code> or <code>lmdb</code> format and you need to write code to obtain the plain data of feature data. There is a simple script written in python.</p>
+<pre>
+import lmdb
+from caffe.proto import caffe_pb2
+
+def save2txt(db_name):
+    img_db = lmdb.open(db_name)
+    txn = img_db.begin()
+    cursor = txn.cursor()
+    cursor.iternext()
+
+    datum = caffe_pb2.Datum()
+    for key, value in cursor:
+        datum.ParseFromString(value)
+        data = caffe.io.datum_to_array(datum)
+        data = np.reshape(data, (1, np.product(data.shape)))[0]
+       // data is the feature with shape (#feat, ) 
+       // Your code.
+</pre>
+
+<h3 id="What&#x2019;s-more"><a href="#What&#x2019;s-more" class="headerlink" title="What&#x2019;s more"></a>What&#x2019;s more</h3><p>During the usage of Caffe, you need to do lots of trivial work, like putting the data in certain directory, checking the output of each step is whether correct or not, or sometimes you need to visualize the output data in website in that you probably work on the remote machine, etc.<br>In light of this, being familiar with <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)" target="_blank" rel="external">bash/sh</a>, <a href="https://www.python.org" target="_blank" rel="external">python</a> or <a href="https://www.ruby-lang.org/zh_cn/" target="_blank" rel="external">ruby</a> will greatly improve your working efficiency. You can check my <a href="https://gist.github.com/ctliu3/fc1148da3922cff09eb7" target="_blank" rel="external">code snippet</a> in github for fast learning of bash.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;https://github.com/BVLC/caffe&quot;&gt;Caffe&lt;/a&gt; is a wonderful deep learning (DL) framework, written in C++ and it is still under construction. I use Caffe to do some image related tasks these days. Technologically, I use Caffe just around one week, so I&amp;#x2019;m also a newbie. I encounter some &amp;#x201C;pits&amp;#x201D; when using Caffe. So I write down some tips, hope they are helpful to you.&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="ML" scheme="http://ctliu3.com/tags/ML/"/>
+    
+      <category term="DL" scheme="http://ctliu3.com/tags/DL/"/>
+    
+      <category term="Caffe" scheme="http://ctliu3.com/tags/Caffe/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>NLP PA: Parsing</title>
+    <link href="http://ctliu3.com/2013/04/05/nlp-pa-parsing/"/>
+    <id>http://ctliu3.com/2013/04/05/nlp-pa-parsing/</id>
+    <published>2013-04-05T05:57:15.000Z</published>
+    <updated>2016-09-04T14:24:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>&#x672C;&#x5468;&#x7684; PA &#x662F;&#x5BF9;&#x7ED9;&#x5B9A;&#x7684;&#x53E5;&#x5B50;&#x6C42;&#x51FA;&#x76F8;&#x5E94;&#x7684;&#x53E5;&#x6CD5;&#x6811;&#xFF08;Parsing tree&#xFF09;&#x3002;&#x5B9E;&#x9645;&#x4E0A;&#xFF0C;Parsing &#x7ECF;&#x5E38;&#x4E5F;&#x505A;&#x4E3A;&#x4E00;&#x4E9B;&#x5B9E;&#x9645;&#x5E94;&#x7528;&#x7684;&#x9884;&#x5904;&#x7406;&#xFF0C;&#x6BD4;&#x5982;&#x673A;&#x5668;&#x7FFB;&#x8BD1;&#xFF08;Machine Translation, MT&#xFF09;&#xFF0C;&#x56E0;&#x4E3A;&#x4E0D;&#x540C;&#x8BED;&#x8A00;&#x7684;&#x53E5;&#x5B50;&#x7ED3;&#x6784;&#xFF08;&#x5982;&#x4E3B;&#x8C13;&#x5BBE;&#xFF09;&#x6709;&#x5F88;&#x5927;&#x7684;&#x533A;&#x522B;&#xFF0C;&#x901A;&#x8FC7;&#x53E5;&#x6CD5;&#x5206;&#x6790;&#x5F97;&#x5230;&#x53E5;&#x5B50;&#x7684;&#x7ED3;&#x6784;&#x53CA;&#x5355;&#x8BCD;&#x8BCD;&#x6027;&#xFF0C;&#x518D;&#x6839;&#x636E;&#x4E0D;&#x540C;&#x8BED;&#x8A00;&#x672C;&#x8EAB;&#x7684;&#x53E5;&#x6CD5;&#x7279;&#x70B9;&#x8FDB;&#x884C;&#x53D8;&#x6362;&#x3002;</p>
+<a id="more"></a>
+<p>&#x5728; NLP &#x4E2D;&#xFF0C;&#x8BCD;&#x7C7B;&#x6807;&#x6CE8;&#xFF08;Part-of-speech Tagging, POS&#xFF09;&#x4E5F;&#x8DDF; Parsing &#x6709;&#x5173;&#x7CFB;&#x3002;POS &#x53EF;&#x4EE5;&#x4F5C;&#x4E3A; Parsing &#x7684;&#x9884;&#x5904;&#x7406;&#xFF0C;&#x56E0;&#x4E3A;&#x5728;&#x6211;&#x4EEC;&#x901A;&#x8FC7; tagging &#x786E;&#x5B9A;&#x4E86;&#x6BCF;&#x4E2A;&#x8BCD;&#x8BED;&#x7684;&#x8BCD;&#x6027;&#x65F6;&#xFF0C;&#x540E;&#x7EED;&#x7684; Parsing &#x89C4;&#x5219;&#x5C31;&#x53EF;&#x4EE5;&#x5F97;&#x5230;&#x7B80;&#x5316;&#x3002;&#x4E0D;&#x8FC7;&#x7531;&#x4E8E; tagging &#x4E5F;&#x4F1A;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF0C;&#x6240;&#x4EE5;&#x52A0;&#x4E86;&#x6548;&#x679C;&#x4E0D;&#x4E00;&#x5B9A;&#x66F4;&#x597D;&#x3002;</p>
+<p><a href="http://www.cs.columbia.edu/~mcollins/courses/nlp2011/notes/pcfgs.pdf" title="PCFG" target="_blank" rel="external">PCFG</a>&#x662F;&#x4E00;&#x79CD;&#x57FA;&#x4E8E;&#x7EDF;&#x8BA1;&#x3001;&#x89C4;&#x5219;&#x7684;&#x6C42;&#x89E3; Parsing &#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x5F53;&#x7136;&#x8BE5;&#x65B9;&#x6CD5;&#x5DF2;&#x7ECF;&#x5F88;&#x65E9;&#x4E86;&#xFF0C;&#x53EA;&#x80FD;&#x4F5C;&#x4E3A; baseline&#xFF0C;&#x4E0D;&#x8FC7;&#x73B0;&#x5728;&#x5F88;&#x591A;&#x7684;&#x65B9;&#x6CD5;&#x548C;&#x6A21;&#x578B;&#x8FD8;&#x662F;&#x4EE5;&#x6B64;&#x4E3A;&#x57FA;&#x7840;&#x3002;&#x8BBE;&#x6709;&#x5143;&#x7EC4;</p>
+<span>$G = \left( N, \Sigma, S, R, q\right)$</span><!-- Has MathJax -->
+<p>&#x5176;&#x4E2D;&#xFF0C;$N$ &#x4E3A;&#x975E;&#x53F6;&#x7ED3;&#x70B9;&#xFF08;non-terminals&#xFF09;&#xFF0C;$\Sigma$ &#x4E3A; Parsing tree &#x7684;&#x53F6;&#x7ED3;&#x70B9;&#xFF08;vocabulary&#xFF09;&#xFF0C;$R$ &#x4E3A;&#x89C4;&#x5219;&#xFF08;rule&#xFF09;&#xFF0C;$q$ &#x4E3A;&#x89C4;&#x5219;&#x7684;&#x53C2;&#x6570;&#xFF08;parameter&#xFF09;&#x3002;&#x5728;&#x672C;&#x9898;&#x4E2D;&#xFF0C;$R$ &#x662F;&#x6EE1;&#x8DB3; Chomsky Normal Form&#xFF08;<a href="http://en.wikipedia.org/wiki/Chomsky_normal_form" title="CNF" target="_blank" rel="external">CNF</a>&#xFF09;&#x7684;&#xFF0C;&#x5373;&#x53EA;&#x6709;&#x4EE5;&#x4E0B;&#x4E24;&#x79CD;&#x5F62;&#x5F0F;&#xFF1A;</p>
+<span>$$\begin{eqnarray*}
+&amp;&amp; X \to Y_1Y_2, &#x5176;&#x4E2D;X \in N, Y_1 \in N, Y_2 \in N \\
+&amp;&amp; X \to Y, &#x5176;&#x4E2D;X \in N, Y \in \Sigma
+\end{eqnarray*}$$</span><!-- Has MathJax -->
+<h3 id="Part-1-20-points"><a href="#Part-1-20-points" class="headerlink" title="Part 1 (20 points)"></a>Part 1 (20 points)</h3><p>&#x8BE5;&#x6B65;&#x9AA4;&#x8DDF;&#x4E0A;&#x6B21;&#x7684; HMM tagger &#x9884;&#x5904;&#x7406;&#x4E00;&#x6837;&#xFF0C;&#x628A;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#x7684;&#x8BCD;&#x6C47;&#x5206;&#x6210;&#x4E24;&#x79CD;&#xFF1A;&#x51FA;&#x73B0;&#x9891;&#x7387; &lt;5 &#x7684;&#x4E3A; <code>RARE</code>&#xFF0C;&#x5426;&#x5219;&#x4E3A; <code>non-RARE</code>&#xFF0C;&#x8BE5;&#x6B65;&#x9AA4;&#x4E5F;&#x53EF;&#x4EE5;&#x7406;&#x89E3;&#x6210;&#x662F;&#x4E00;&#x4E2A;&#x5E73;&#x6ED1;&#x64CD;&#x4F5C;&#x3002;</p>
+<p><a href="https://gist.github.com/ctLiu3/5317639#file-gistfile1-py" title="A2P2" target="_blank">[code]</a></p>
+<h3 id="Part-2-40-points"><a href="#Part-2-40-points" class="headerlink" title="Part 2 (40 points)"></a>Part 2 (40 points)</h3><p>&#x5F97;&#x5230; Parsing tree &#x7684;&#x8FC7;&#x7A0B;&#x7528;&#x7684;&#x662F;<a href="http://en.wikipedia.org/wiki/CYK_algorithm" title="CKY Algorithm" target="_blank" rel="external">CKY&#x7B97;&#x6CD5;</a>&#xFF0C;&#x5176;&#x5B9E;&#x5C31;&#x662F;&#x4E2A; bottom-up &#x7684; 3 &#x7EF4;DP&#x3002;DP(i,j,X) &#x8868;&#x793A;&#x5F85;&#x5206;&#x6790;&#x53E5;&#x5B50;&#x7684;&#x7B2C; i &#x4E2A;&#x5355;&#x8BCD;&#x5230;&#x7B2C; j &#x4E2A;&#x5355;&#x8BCD;&#xFF0C;&#x89C4;&#x5219;&#x7684; left-hand side &#x4E3A; X &#x7684;&#x6982;&#x7387;&#x6700;&#x5927;&#x503C;&#x3002;&#x76EE;&#x6807;&#x72B6;&#x6001;&#x4E3A; DP(1,n,&#x201D;SBARQ&#x201D;)&#xFF0C;&#x201D;SBARQ&#x201D; &#x4E3A;&#x9898;&#x76EE;&#x6307;&#x5B9A;&#x7684;&#x503C;&#xFF0C;&#x5F53;&#x7136;&#x81EA;&#x5DF1;&#x53BB;&#x904D;&#x5386;&#x6240;&#x6709;&#x7684; symbol &#x4E5F;&#x662F;&#x53EF;&#x4EE5;&#x7684;&#x3002;&#x72B6;&#x6001;&#x8F6C;&#x79FB;&#x65B9;&#x7A0B;&#x4E3A;&#xFF1A;</p>
+<span>$DP(i,j,X) = max\{P(X \to Y \ Z) \times DP(i,s,Y) \times DP(s+1,j,Z) \}$</span><!-- Has MathJax -->
+<p>&#x51E0;&#x4E2A;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x5751;&#xFF1A;</p>
+<p>1 &#x521D;&#x59CB;&#x5316;&#x3002;&#x521D;&#x59CB;&#x7684;&#x90E8;&#x5206;&#x662F; Parsing tree &#x7684;&#x53F6;&#x7ED3;&#x70B9;&#x3002;&#x5728; Part 1 &#x4E2D;&#x6211;&#x4EEC;&#x5DF2;&#x7ECF;&#x5C06;&#x8BAD;&#x7EC3;&#x96C6;&#x5206;&#x6210;&#x4E24;&#x7C7B;&#xFF1A;RARE &#x548C; non-RARE&#x3002;&#x8BE5;&#x521D;&#x59CB;&#x5316;&#x5FC5;&#x987B;&#x9075;&#x5B88;&#x4EE5;&#x4E0B;&#x6B65;&#x9AA4;&#xFF1A;</p>
+<ul>
+<li>&#x5982;&#x679C; P(X-&gt;Xi) &#x5728; <code>parse_train.counts.out</code> &#x51FA;&#x73B0;&#x8FC7;&#xFF0C;&#x5373;&#x8BF4;&#x660E; Xi &#x4E0D;&#x662F; <code>RARE</code>&#xFF0C;&#x90A3;&#x4E48;&#x76F4;&#x63A5;&#x8D4B;&#x503C; P(X-&gt;Xi)&#xFF1B;</li>
+<li>&#x5426;&#x5219;&#x5982;&#x679C; Xi &#x6CA1;&#x6709;&#x51FA;&#x73B0;&#x5728; <code>parse_train.counts.out</code> &#x5E76;&#x4E14; P(X-&gt;<code>RARE</code>) &#x5B58;&#x5728;&#xFF0C;&#x90A3;&#x4E48;&#x8D4B;&#x503C; P(X-&gt;<code>RARE</code>)&#xFF1B;</li>
+<li>&#x5426;&#x5219;&#xFF0C;&#x8D4B;&#x503C;&#x4E3A; 0&#x3002;</li>
+</ul>
+<p>&#x56E0;&#x4E3A;&#x6982;&#x7387;&#x76F8;&#x4E58;&#x4F1A;&#x5BFC;&#x81F4;&#x8FC7;&#x5C0F;&#x7684;&#x503C;&#xFF0C;&#x53EF;&#x4EE5;&#x7528; log &#x8F6C;&#x5316;&#xFF0C;&#x5F53;&#x7136;&#x672C;&#x9898;&#x4E0D;&#x8F6C;&#x4E5F;&#x53EF;&#x4EE5;&#x3002;</p>
+<p>2 &#x7ED3;&#x679C;&#x8F93;&#x51FA;&#x3002;&#x6309;&#x9898;&#x76EE;&#x8981;&#x6C42;&#xFF0C;&#x6C42;&#x89E3;&#x5F97;&#x5230;&#x7684; Parsing tree &#x662F;&#x7528; <code>json</code> &#x6765;&#x89E3;&#x6790;&#x7684;&#xFF0C;&#x6BD4;&#x5982;&#x4EE5;&#x4E0B;&#x662F;&#x4E00;&#x4E2A;&#x8F93;&#x51FA;&#x7ED3;&#x679C;&#xFF1A;</p>
+<pre>
+[&quot;SBARQ&quot;, [&quot;WHNP+PRON&quot;, &quot;What&quot;], [&quot;SBARQ&quot;, [&quot;SQ&quot;, [&quot;VERB&quot;, &quot;are&quot;], [&quot;NP+NOUN&quot;, &quot;geckos&quot;]], [&quot;.&quot;, &quot;?&quot;]]]
+</pre>
+
+<p>&#x5982;&#x679C;&#x662F;&#x7528; python &#x76F4;&#x63A5; <code>print</code> &#x7684;&#x8BDD;&#xFF0C;&#x5B57;&#x7B26;&#x4E32;&#x662F;&#x4EE5;&#x5355;&#x5F15;&#x53F7;&#x5F62;&#x5F0F;&#x51FA;&#x73B0;&#x7684;&#xFF0C;&#x76F4;&#x63A5;&#x7528; json &#x89E3;&#x6790;&#x4F1A;&#x51FA;&#x9519;&#x3002;&#x5728; VIM &#x4E0B;&#x53EF;&#x4EE5;&#x7528;&#x5168;&#x5C40;&#x66FF;&#x6362;&#x547D;&#x4EE4;&#x8FDB;&#x884C;&#x66FF;&#x6362;&#xFF1A;<code>%s/&apos;/&quot;/g</code>&#x3002;</p>
+<p><a href="https://gist.github.com/ctLiu3/5317639#file-gistfile2-py" title="A2P3" target="_blank">[code]</a></p>
+<h3 id="Part-3-1-point"><a href="#Part-3-1-point" class="headerlink" title="Part 3 (1 point)"></a>Part 3 (1 point)</h3><p>&#x8BE5;&#x90E8;&#x5206;&#x53EA;&#x662F;&#x5728; Part 2 &#x7684;&#x57FA;&#x7840;&#x4E0A;&#xFF0C;&#x5728; Parsing tree &#x7684;&#x6BCF;&#x4E2A;&#x7ED3;&#x70B9;&#x4E0A;&#x52A0;&#x5165;&#x4E86; <code>parent</code> &#x4FE1;&#x606F;&#x3002;&#x56E0;&#x4E3A;&#x5BF9;&#x4E8E;&#x539F;&#x59CB;&#x7684; PCFG &#x6765;&#x8BF4;&#xFF1A;Independence assumption is too strong! &#x7531;&#x4E8E;&#x8BE5;&#x4FE1;&#x606F;&#x6570;&#x636E;&#x5DF2;&#x7ECF;&#x7ED9;&#x51FA;&#xFF0C;&#x6240;&#x4EE5;&#x6C42;&#x89E3;&#x8FC7;&#x7A0B;&#x8DDF; Part 2 &#x5DEE;&#x4E0D;&#x591A;&#x3002;&#x53EA;&#x4E0D;&#x8FC7;&#x8FD9;&#x65F6;&#x7684; non-terminal &#x6570;&#x636E;&#x91CF;&#x4F1A;&#x589E;&#x52A0;&#xFF0C;&#x590D;&#x6742;&#x5EA6;&#x4F1A;&#x9AD8;&#x4E9B;&#x3002;&#x5982;&#x679C;&#x4F60; Part 2 &#x7684;&#x4EE3;&#x7801;&#x5DF2;&#x7ECF;&#x662F;&#x6BD4;&#x8F83;&#x4F18;&#x5316;&#x7684;&#xFF0C;&#x8DD1; Part 3 &#x7684;&#x6570;&#x636E;&#x4E5F;&#x4E0D;&#x4F1A;&#x6162;&#x591A;&#x5C11;&#x3002;</p>
+<h3 id="Weakness-of-PCFG"><a href="#Weakness-of-PCFG" class="headerlink" title="Weakness of PCFG"></a>Weakness of PCFG</h3><p>&#x4F5C;&#x4E3A;&#x4E00;&#x4E2A;&#x6559;&#x79D1;&#x4E66;&#x4E0A;&#x7684;&#x7B97;&#x6CD5;&#xFF0C;PCGF &#x52A3;&#x52BF; &gt;=2&#xFF1A;</p>
+<p>1 &#x6CA1;&#x6709;&#x5145;&#x5206;&#x5229;&#x7528;&#x53E5;&#x4E2D;&#x5355;&#x8BCD;&#x5E26;&#x6765;&#x7684;&#x4FE1;&#x606F;&#x91CF;&#x3002;&#x7B97;&#x6CD5;&#x8FC7;&#x7A0B;&#x4E2D;&#x53EA;&#x6709;&#x5728;&#x6C42;&#x89E3; $P(X \to X_i)$ &#x7528;&#x5230;&#x4E86;&#x5355;&#x8BCD;&#x7684;&#x4FE1;&#x606F;&#xFF0C;&#x800C;&#x8BE5;&#x4FE1;&#x606F;&#x6CA1;&#x6709;&#x4F5C;&#x7528;&#x5230;&#x5168;&#x5C40;&#x4E0A;&#x3002;</p>
+<p>2 &#x6CA1;&#x6709;&#x5145;&#x5206;&#x5229;&#x7528;&#x53E5;&#x5B50;&#x7684;&#x7ED3;&#x6784;&#x4FE1;&#x606F;&#x3002;&#x540C;&#x6837;&#x7684; rule&#xFF0C;&#x540C;&#x6837;&#x7684; probability value&#xFF0C;&#x53EF;&#x80FD;&#x5BFC;&#x81F4;&#x4E0D;&#x540C;&#x7684; Parsing tree&#x3002;</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;#x672C;&amp;#x5468;&amp;#x7684; PA &amp;#x662F;&amp;#x5BF9;&amp;#x7ED9;&amp;#x5B9A;&amp;#x7684;&amp;#x53E5;&amp;#x5B50;&amp;#x6C42;&amp;#x51FA;&amp;#x76F8;&amp;#x5E94;&amp;#x7684;&amp;#x53E5;&amp;#x6CD5;&amp;#x6811;&amp;#xFF08;Parsing tree&amp;#xFF09;&amp;#x3002;&amp;#x5B9E;&amp;#x9645;&amp;#x4E0A;&amp;#xFF0C;Parsing &amp;#x7ECF;&amp;#x5E38;&amp;#x4E5F;&amp;#x505A;&amp;#x4E3A;&amp;#x4E00;&amp;#x4E9B;&amp;#x5B9E;&amp;#x9645;&amp;#x5E94;&amp;#x7528;&amp;#x7684;&amp;#x9884;&amp;#x5904;&amp;#x7406;&amp;#xFF0C;&amp;#x6BD4;&amp;#x5982;&amp;#x673A;&amp;#x5668;&amp;#x7FFB;&amp;#x8BD1;&amp;#xFF08;Machine Translation, MT&amp;#xFF09;&amp;#xFF0C;&amp;#x56E0;&amp;#x4E3A;&amp;#x4E0D;&amp;#x540C;&amp;#x8BED;&amp;#x8A00;&amp;#x7684;&amp;#x53E5;&amp;#x5B50;&amp;#x7ED3;&amp;#x6784;&amp;#xFF08;&amp;#x5982;&amp;#x4E3B;&amp;#x8C13;&amp;#x5BBE;&amp;#xFF09;&amp;#x6709;&amp;#x5F88;&amp;#x5927;&amp;#x7684;&amp;#x533A;&amp;#x522B;&amp;#xFF0C;&amp;#x901A;&amp;#x8FC7;&amp;#x53E5;&amp;#x6CD5;&amp;#x5206;&amp;#x6790;&amp;#x5F97;&amp;#x5230;&amp;#x53E5;&amp;#x5B50;&amp;#x7684;&amp;#x7ED3;&amp;#x6784;&amp;#x53CA;&amp;#x5355;&amp;#x8BCD;&amp;#x8BCD;&amp;#x6027;&amp;#xFF0C;&amp;#x518D;&amp;#x6839;&amp;#x636E;&amp;#x4E0D;&amp;#x540C;&amp;#x8BED;&amp;#x8A00;&amp;#x672C;&amp;#x8EAB;&amp;#x7684;&amp;#x53E5;&amp;#x6CD5;&amp;#x7279;&amp;#x70B9;&amp;#x8FDB;&amp;#x884C;&amp;#x53D8;&amp;#x6362;&amp;#x3002;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="NLP" scheme="http://ctliu3.com/categories/NLP/"/>
+    
+    
+      <category term="nlp" scheme="http://ctliu3.com/tags/nlp/"/>
+    
+      <category term="coursera" scheme="http://ctliu3.com/tags/coursera/"/>
+    
+      <category term="prasing" scheme="http://ctliu3.com/tags/prasing/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>NLP PA: Hidden Markov Models</title>
+    <link href="http://ctliu3.com/2013/03/24/nlp-pa-hidden-markov-models/"/>
+    <id>http://ctliu3.com/2013/03/24/nlp-pa-hidden-markov-models/</id>
+    <published>2013-03-24T05:27:49.000Z</published>
+    <updated>2016-09-04T14:33:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://class.coursera.org/nlangp-001/class/index" title="NLP" target="_blank" rel="external">&#x4F20;&#x9001;&#x95E8;</a> </p>
+<p>HMM &#x662F;&#x901A;&#x8FC7;&#x9884;&#x6D4B;&#x4E00;&#x8FDE;&#x4E32;&#x7684; $y_i$ &#x6765;&#x5F97;&#x5230;&#x6A21;&#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &#x7684;&#x6982;&#x7387;&#x6700;&#x5927;&#x503C;&#x3002;&#x672C;&#x5468;&#x7684; Programming &#x4E3B;&#x8981;&#x662F;&#x5229;&#x7528; HMM &#x6765;&#x505A;&#x9488;&#x5BF9;&#x53E5;&#x5B50;&#x7684;&#x8BCD;&#x6027; tagger&#x3002;</p>
+<a id="more"></a>
+<span>$$p(x_1 \dots x_n, y_1 \dots y_{n+1}) = 
+\prod_{i=1}^{n+1} q(y_i|y_{i-2},y_{i-1}) \times \prod_{i=1}^n e(x_i|y_i)$$</span><!-- Has MathJax -->
+<p>&#x4E3A;&#x65B9;&#x4FBF;&#x6C42;&#x89E3;&#xFF0C;&#x4E00;&#x822C;&#x628A;&#x5F85;&#x6807;&#x6CE8;&#x7684;&#x53E5;&#x5B50;&#x53D8;&#x6210;*,*,sentence,STOP&#xFF0C;&#x5373; $ y<em>0=y</em>{-1}=*, y_n=STOP $&#x3002;&#x5728;&#x6807;&#x6CE8;&#x524D;&#xFF0C;&#x5148;&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5904;&#x7406;&#xFF1A;&#x628A;&#x6240;&#x6709;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#x51FA;&#x73B0;&#x4E14;&#x6B21;&#x6570; &lt;5 &#x7684;&#x5355;&#x8BCD;&#x66FF;&#x6362;&#x6210; <code>RARE</code>&#x3002;</p>
+<h3 id="Part-1"><a href="#Part-1" class="headerlink" title="Part 1"></a>Part 1</h3><p>&#x4F5C;&#x4E3A; baseline&#xFF0C;&#x4E00;&#x5F00;&#x59CB;&#x5FFD;&#x7565;&#x53E5;&#x5B50;&#x5185;&#x90E8;&#x7684;&#x8054;&#x7CFB;&#xFF0C;&#x7528;MLE&#x6765;&#x4F30;&#x8BA1;&#x6BCF;&#x4E2A; $x_i$ &#x6240;&#x5C5E;&#x7684; tag&#x3002;&#x4E5F;&#x5C31;&#x662F;&#x6C42;$${\arg\max_y} e(x|y)$$</p>
+<p>&#x5176;&#x4E2D;</p>
+<p>$$<br>e(x|y) = \frac{Count(x, y)}{Count(y)}<br>$$</p>
+<p>$Count(x,y)$ &#x8868;&#x793A; $x$ &#x548C; $y$ &#x4E00;&#x8D77;&#x51FA;&#x73B0;&#x7684;&#x6982;&#x7387;&#x3002;&#x5982;&#x679C;&#x5BF9;&#x4E8E;&#x672A;&#x51FA;&#x73B0;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x7684;&#x8BCD;&#xFF0C;$p(x\vert y_i)=0$&#xFF0C;&#x800C;&#x65E0;&#x6CD5;&#x53D6; max &#x503C;&#x3002;&#x6240;&#x4EE5;&#x8FD9;&#x65F6;&#x628A; $x$ &#x5F53;&#x6210;&#x662F; RARE&#xFF0C;&#x5BF9;&#x6BD4; $p(RARE\vert y_i)$ &#x7684;&#x503C;&#x3002;</p>
+<h3 id="Part-2"><a href="#Part-2" class="headerlink" title="Part 2"></a>Part 2</h3><p>&#x8FD9;&#x90E8;&#x5206;&#x5B9E;&#x73B0;&#x7684;&#x662F;Viterbi&#x7B97;&#x6CD5;&#xFF0C;&#x7ECF;&#x5178;&#x7684; $O(n|S|^3)$ &#x7684; DP&#x3002;DP(i,u,v) &#x8868;&#x793A;&#x4EE5; i &#x4E3A;&#x7ED3;&#x5C3E;&#xFF0C;&#x524D;&#x4E24;&#x4E2A;&#x8FDE;&#x7EED;&#x7684;&#x5355;&#x8BCD;&#x4E3A; u,v &#x7684;&#x6700;&#x5927;&#x503C;&#x3002;&#x8F6C;&#x79FB;&#x65B9;&#x7A0B;&#x4E3A;</p>
+<span>$DP(i,y_i,y_{i-1}) = max\{ DP(i-1, y_{i-1}, y_{i-2}) \times p(y_i|y_{i-2},y_{i-1}) \times e(x_i|y_i) \}$</span><!-- Has MathJax -->
+<p>&#x521D;&#x59CB;&#x5316;$DP(0,*,*) = 1$&#x3002;&#x76EE;&#x6807;&#x72B6;&#x6001;&#x4E3A;$DP(n,STOP,u)$&#x3002;</p>
+<p>&#x6C42;&#x89E3;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x5BF9;&#x4E8E;&#x672A;&#x51FA;&#x73B0;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#x7684;&#x8BCD;&#xFF0C;&#x540C;&#x6837;&#x5F53;&#x6210; RARE &#x5904;&#x7406;&#x3002;&#x800C;&#x5BF9;&#x4E8E;&#x51FA;&#x73B0;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#xFF0C;&#x800C; $Count(x,y)=0$ &#x7684;&#x8BCD;&#xFF0C;&#x5176; $e(x\vert y)$ &#x503C;&#x4E3A; 0&#x3002;&#x53E6;&#x5916;&#xFF0C;&#x5728; DP &#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;$y_{-1,0,n+1}$ &#x7684; tag &#x90FD;&#x4E3A;&#x5DF2;&#x77E5;&#xFF0C;&#x6240;&#x4EE5;&#x4E5F;&#x8981;&#x52A0;&#x7279;&#x5224;&#x3002;</p>
+<h3 id="Part-3"><a href="#Part-3" class="headerlink" title="Part 3"></a>Part 3</h3><p>&#x4E3A;&#x4E86;&#x589E;&#x52A0;&#x5BF9; <code>RARE</code> &#x7684;&#x5224;&#x522B;&#x6027;&#xFF0C;&#x8FD9;&#x90E8;&#x5206;&#x628A; RARE &#x518D;&#x8FDB;&#x884C;&#x4E86;&#x7EC6;&#x5316;&#xFF0C;&#x6BD4;&#x5982;&#x5168;&#x4E3A;&#x5927;&#x5199;&#x7684;&#x4E3A;&#x4E00;&#x7C7B;&#xFF0C;&#x51FA;&#x73B0;&#x6570;&#x5B57;&#x7684;&#x4E3A;&#x4E00;&#x7C7B;&#x3002;</p>
+<p>&#x5BF9;&#x4E8E; <code>gene.test</code>&#xFF0C;&#x4E09;&#x79CD;&#x65B9;&#x6CD5;&#x7684; F1-Score &#x5982;&#x4E0B;&#xFF1A;</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">#Part 1</th>
+<th style="text-align:center">#Part 2</th>
+<th>#Part 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0.26308</td>
+<td style="text-align:center">0.36514</td>
+<td>0.39519</td>
+</tr>
+</tbody>
+</table>
+<p>&#x9664;&#x4E86; #Part 2 &#x8DDF; Goal F1-Score &#x5DEE; &#x4E86;0.00030&#xFF0C;&#x5176;&#x4ED6;&#x90FD;&#x4E00;&#x81F4;&#x3002;</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;https://class.coursera.org/nlangp-001/class/index&quot; title=&quot;NLP&quot;&gt;&amp;#x4F20;&amp;#x9001;&amp;#x95E8;&lt;/a&gt; &lt;/p&gt;
+&lt;p&gt;HMM &amp;#x662F;&amp;#x901A;&amp;#x8FC7;&amp;#x9884;&amp;#x6D4B;&amp;#x4E00;&amp;#x8FDE;&amp;#x4E32;&amp;#x7684; $y_i$ &amp;#x6765;&amp;#x5F97;&amp;#x5230;&amp;#x6A21;&amp;#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &amp;#x7684;&amp;#x6982;&amp;#x7387;&amp;#x6700;&amp;#x5927;&amp;#x503C;&amp;#x3002;&amp;#x672C;&amp;#x5468;&amp;#x7684; Programming &amp;#x4E3B;&amp;#x8981;&amp;#x662F;&amp;#x5229;&amp;#x7528; HMM &amp;#x6765;&amp;#x505A;&amp;#x9488;&amp;#x5BF9;&amp;#x53E5;&amp;#x5B50;&amp;#x7684;&amp;#x8BCD;&amp;#x6027; tagger&amp;#x3002;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="NLP" scheme="http://ctliu3.com/categories/NLP/"/>
+    
+    
+      <category term="nlp" scheme="http://ctliu3.com/tags/nlp/"/>
+    
+      <category term="coursera" scheme="http://ctliu3.com/tags/coursera/"/>
+    
+      <category term="hmm" scheme="http://ctliu3.com/tags/hmm/"/>
+    
+  </entry>
+  
+</feed>

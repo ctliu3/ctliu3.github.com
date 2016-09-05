@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>NLP PA: Hidden Markov Models - ct.Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="&amp;#x4F20;&amp;#x9001;&amp;#x95E8; 
+HMM &amp;#x662F;&amp;#x901A;&amp;#x8FC7;&amp;#x9884;&amp;#x6D4B;&amp;#x4E00;&amp;#x8FDE;&amp;#x4E32;&amp;#x7684; $y_i$ &amp;#x6765;&amp;#x5F97;&amp;#x5230;&amp;#x6A21;&amp;#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &amp;#x7684;&amp;#x6982;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP PA: Hidden Markov Models">
+<meta property="og:url" content="http://ctliu3.com/2013/03/24/nlp-pa-hidden-markov-models/index.html">
+<meta property="og:site_name" content="ct.Liu">
+<meta property="og:description" content="&amp;#x4F20;&amp;#x9001;&amp;#x95E8; 
+HMM &amp;#x662F;&amp;#x901A;&amp;#x8FC7;&amp;#x9884;&amp;#x6D4B;&amp;#x4E00;&amp;#x8FDE;&amp;#x4E32;&amp;#x7684; $y_i$ &amp;#x6765;&amp;#x5F97;&amp;#x5230;&amp;#x6A21;&amp;#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &amp;#x7684;&amp;#x6982;">
+<meta property="og:updated_time" content="2016-09-04T14:33:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NLP PA: Hidden Markov Models">
+<meta name="twitter:description" content="&amp;#x4F20;&amp;#x9001;&amp;#x95E8; 
+HMM &amp;#x662F;&amp;#x901A;&amp;#x8FC7;&amp;#x9884;&amp;#x6D4B;&amp;#x4E00;&amp;#x8FDE;&amp;#x4E32;&amp;#x7684; $y_i$ &amp;#x6765;&amp;#x5F97;&amp;#x5230;&amp;#x6A21;&amp;#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &amp;#x7684;&amp;#x6982;">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+</head>
+
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ctliu3.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-nlp-pa-hidden-markov-models" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      NLP PA: Hidden Markov Models
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2013/03/24/nlp-pa-hidden-markov-models/" class="article-date">
+  <time datetime="2013-03-24T05:27:49.000Z" itemprop="datePublished">2013-03-24</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NLP/">NLP</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://class.coursera.org/nlangp-001/class/index" title="NLP" target="_blank" rel="external">&#x4F20;&#x9001;&#x95E8;</a> </p>
+<p>HMM &#x662F;&#x901A;&#x8FC7;&#x9884;&#x6D4B;&#x4E00;&#x8FDE;&#x4E32;&#x7684; $y_i$ &#x6765;&#x5F97;&#x5230;&#x6A21;&#x578B; $p(x_1 \dots x_n, y_1 \dots y_n)$ &#x7684;&#x6982;&#x7387;&#x6700;&#x5927;&#x503C;&#x3002;&#x672C;&#x5468;&#x7684; Programming &#x4E3B;&#x8981;&#x662F;&#x5229;&#x7528; HMM &#x6765;&#x505A;&#x9488;&#x5BF9;&#x53E5;&#x5B50;&#x7684;&#x8BCD;&#x6027; tagger&#x3002;</p>
+<a id="more"></a>
+<span>$$p(x_1 \dots x_n, y_1 \dots y_{n+1}) = 
+\prod_{i=1}^{n+1} q(y_i|y_{i-2},y_{i-1}) \times \prod_{i=1}^n e(x_i|y_i)$$</span><!-- Has MathJax -->
+<p>&#x4E3A;&#x65B9;&#x4FBF;&#x6C42;&#x89E3;&#xFF0C;&#x4E00;&#x822C;&#x628A;&#x5F85;&#x6807;&#x6CE8;&#x7684;&#x53E5;&#x5B50;&#x53D8;&#x6210;*,*,sentence,STOP&#xFF0C;&#x5373; $ y<em>0=y</em>{-1}=*, y_n=STOP $&#x3002;&#x5728;&#x6807;&#x6CE8;&#x524D;&#xFF0C;&#x5148;&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5904;&#x7406;&#xFF1A;&#x628A;&#x6240;&#x6709;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#x51FA;&#x73B0;&#x4E14;&#x6B21;&#x6570; &lt;5 &#x7684;&#x5355;&#x8BCD;&#x66FF;&#x6362;&#x6210; <code>RARE</code>&#x3002;</p>
+<h3 id="Part-1"><a href="#Part-1" class="headerlink" title="Part 1"></a>Part 1</h3><p>&#x4F5C;&#x4E3A; baseline&#xFF0C;&#x4E00;&#x5F00;&#x59CB;&#x5FFD;&#x7565;&#x53E5;&#x5B50;&#x5185;&#x90E8;&#x7684;&#x8054;&#x7CFB;&#xFF0C;&#x7528;MLE&#x6765;&#x4F30;&#x8BA1;&#x6BCF;&#x4E2A; $x_i$ &#x6240;&#x5C5E;&#x7684; tag&#x3002;&#x4E5F;&#x5C31;&#x662F;&#x6C42;$${\arg\max_y} e(x|y)$$</p>
+<p>&#x5176;&#x4E2D;</p>
+<p>$$<br>e(x|y) = \frac{Count(x, y)}{Count(y)}<br>$$</p>
+<p>$Count(x,y)$ &#x8868;&#x793A; $x$ &#x548C; $y$ &#x4E00;&#x8D77;&#x51FA;&#x73B0;&#x7684;&#x6982;&#x7387;&#x3002;&#x5982;&#x679C;&#x5BF9;&#x4E8E;&#x672A;&#x51FA;&#x73B0;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x7684;&#x8BCD;&#xFF0C;$p(x\vert y_i)=0$&#xFF0C;&#x800C;&#x65E0;&#x6CD5;&#x53D6; max &#x503C;&#x3002;&#x6240;&#x4EE5;&#x8FD9;&#x65F6;&#x628A; $x$ &#x5F53;&#x6210;&#x662F; RARE&#xFF0C;&#x5BF9;&#x6BD4; $p(RARE\vert y_i)$ &#x7684;&#x503C;&#x3002;</p>
+<h3 id="Part-2"><a href="#Part-2" class="headerlink" title="Part 2"></a>Part 2</h3><p>&#x8FD9;&#x90E8;&#x5206;&#x5B9E;&#x73B0;&#x7684;&#x662F;Viterbi&#x7B97;&#x6CD5;&#xFF0C;&#x7ECF;&#x5178;&#x7684; $O(n|S|^3)$ &#x7684; DP&#x3002;DP(i,u,v) &#x8868;&#x793A;&#x4EE5; i &#x4E3A;&#x7ED3;&#x5C3E;&#xFF0C;&#x524D;&#x4E24;&#x4E2A;&#x8FDE;&#x7EED;&#x7684;&#x5355;&#x8BCD;&#x4E3A; u,v &#x7684;&#x6700;&#x5927;&#x503C;&#x3002;&#x8F6C;&#x79FB;&#x65B9;&#x7A0B;&#x4E3A;</p>
+<span>$DP(i,y_i,y_{i-1}) = max\{ DP(i-1, y_{i-1}, y_{i-2}) \times p(y_i|y_{i-2},y_{i-1}) \times e(x_i|y_i) \}$</span><!-- Has MathJax -->
+<p>&#x521D;&#x59CB;&#x5316;$DP(0,*,*) = 1$&#x3002;&#x76EE;&#x6807;&#x72B6;&#x6001;&#x4E3A;$DP(n,STOP,u)$&#x3002;</p>
+<p>&#x6C42;&#x89E3;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x5BF9;&#x4E8E;&#x672A;&#x51FA;&#x73B0;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#x7684;&#x8BCD;&#xFF0C;&#x540C;&#x6837;&#x5F53;&#x6210; RARE &#x5904;&#x7406;&#x3002;&#x800C;&#x5BF9;&#x4E8E;&#x51FA;&#x73B0;&#x5728;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#xFF0C;&#x800C; $Count(x,y)=0$ &#x7684;&#x8BCD;&#xFF0C;&#x5176; $e(x\vert y)$ &#x503C;&#x4E3A; 0&#x3002;&#x53E6;&#x5916;&#xFF0C;&#x5728; DP &#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;$y_{-1,0,n+1}$ &#x7684; tag &#x90FD;&#x4E3A;&#x5DF2;&#x77E5;&#xFF0C;&#x6240;&#x4EE5;&#x4E5F;&#x8981;&#x52A0;&#x7279;&#x5224;&#x3002;</p>
+<h3 id="Part-3"><a href="#Part-3" class="headerlink" title="Part 3"></a>Part 3</h3><p>&#x4E3A;&#x4E86;&#x589E;&#x52A0;&#x5BF9; <code>RARE</code> &#x7684;&#x5224;&#x522B;&#x6027;&#xFF0C;&#x8FD9;&#x90E8;&#x5206;&#x628A; RARE &#x518D;&#x8FDB;&#x884C;&#x4E86;&#x7EC6;&#x5316;&#xFF0C;&#x6BD4;&#x5982;&#x5168;&#x4E3A;&#x5927;&#x5199;&#x7684;&#x4E3A;&#x4E00;&#x7C7B;&#xFF0C;&#x51FA;&#x73B0;&#x6570;&#x5B57;&#x7684;&#x4E3A;&#x4E00;&#x7C7B;&#x3002;</p>
+<p>&#x5BF9;&#x4E8E; <code>gene.test</code>&#xFF0C;&#x4E09;&#x79CD;&#x65B9;&#x6CD5;&#x7684; F1-Score &#x5982;&#x4E0B;&#xFF1A;</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">#Part 1</th>
+<th style="text-align:center">#Part 2</th>
+<th>#Part 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0.26308</td>
+<td style="text-align:center">0.36514</td>
+<td>0.39519</td>
+</tr>
+</tbody>
+</table>
+<p>&#x9664;&#x4E86; #Part 2 &#x8DDF; Goal F1-Score &#x5DEE; &#x4E86;0.00030&#xFF0C;&#x5176;&#x4ED6;&#x90FD;&#x4E00;&#x81F4;&#x3002;</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/coursera/">coursera</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hmm/">hmm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nlp/">nlp</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/04/05/nlp-pa-parsing/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          NLP PA: Parsing
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 ctliu3&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+<script>
+  var disqus_shortname = 'ctliu3';
+  
+  var disqus_url = 'http://ctliu3.com/2013/03/24/nlp-pa-hidden-markov-models/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>NLP PA: Parsing - ct.Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="&amp;#x672C;&amp;#x5468;&amp;#x7684; PA &amp;#x662F;&amp;#x5BF9;&amp;#x7ED9;&amp;#x5B9A;&amp;#x7684;&amp;#x53E5;&amp;#x5B50;&amp;#x6C42;&amp;#x51FA;&amp;#x76F8;&amp;#x5E94;&amp;#x7684;&amp;#x53E5;&amp;#x6CD5;&amp;#x6811;&amp;#xFF08;Parsing tree&amp;#xFF09;&amp;#x3002;&amp;#x5B9E;&amp;#x9645;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP PA: Parsing">
+<meta property="og:url" content="http://ctliu3.com/2013/04/05/nlp-pa-parsing/index.html">
+<meta property="og:site_name" content="ct.Liu">
+<meta property="og:description" content="&amp;#x672C;&amp;#x5468;&amp;#x7684; PA &amp;#x662F;&amp;#x5BF9;&amp;#x7ED9;&amp;#x5B9A;&amp;#x7684;&amp;#x53E5;&amp;#x5B50;&amp;#x6C42;&amp;#x51FA;&amp;#x76F8;&amp;#x5E94;&amp;#x7684;&amp;#x53E5;&amp;#x6CD5;&amp;#x6811;&amp;#xFF08;Parsing tree&amp;#xFF09;&amp;#x3002;&amp;#x5B9E;&amp;#x9645;">
+<meta property="og:updated_time" content="2016-09-04T14:24:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NLP PA: Parsing">
+<meta name="twitter:description" content="&amp;#x672C;&amp;#x5468;&amp;#x7684; PA &amp;#x662F;&amp;#x5BF9;&amp;#x7ED9;&amp;#x5B9A;&amp;#x7684;&amp;#x53E5;&amp;#x5B50;&amp;#x6C42;&amp;#x51FA;&amp;#x76F8;&amp;#x5E94;&amp;#x7684;&amp;#x53E5;&amp;#x6CD5;&amp;#x6811;&amp;#xFF08;Parsing tree&amp;#xFF09;&amp;#x3002;&amp;#x5B9E;&amp;#x9645;">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+</head>
+
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ctliu3.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-nlp-pa-parsing" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      NLP PA: Parsing
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2013/04/05/nlp-pa-parsing/" class="article-date">
+  <time datetime="2013-04-05T05:57:15.000Z" itemprop="datePublished">2013-04-05</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NLP/">NLP</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>&#x672C;&#x5468;&#x7684; PA &#x662F;&#x5BF9;&#x7ED9;&#x5B9A;&#x7684;&#x53E5;&#x5B50;&#x6C42;&#x51FA;&#x76F8;&#x5E94;&#x7684;&#x53E5;&#x6CD5;&#x6811;&#xFF08;Parsing tree&#xFF09;&#x3002;&#x5B9E;&#x9645;&#x4E0A;&#xFF0C;Parsing &#x7ECF;&#x5E38;&#x4E5F;&#x505A;&#x4E3A;&#x4E00;&#x4E9B;&#x5B9E;&#x9645;&#x5E94;&#x7528;&#x7684;&#x9884;&#x5904;&#x7406;&#xFF0C;&#x6BD4;&#x5982;&#x673A;&#x5668;&#x7FFB;&#x8BD1;&#xFF08;Machine Translation, MT&#xFF09;&#xFF0C;&#x56E0;&#x4E3A;&#x4E0D;&#x540C;&#x8BED;&#x8A00;&#x7684;&#x53E5;&#x5B50;&#x7ED3;&#x6784;&#xFF08;&#x5982;&#x4E3B;&#x8C13;&#x5BBE;&#xFF09;&#x6709;&#x5F88;&#x5927;&#x7684;&#x533A;&#x522B;&#xFF0C;&#x901A;&#x8FC7;&#x53E5;&#x6CD5;&#x5206;&#x6790;&#x5F97;&#x5230;&#x53E5;&#x5B50;&#x7684;&#x7ED3;&#x6784;&#x53CA;&#x5355;&#x8BCD;&#x8BCD;&#x6027;&#xFF0C;&#x518D;&#x6839;&#x636E;&#x4E0D;&#x540C;&#x8BED;&#x8A00;&#x672C;&#x8EAB;&#x7684;&#x53E5;&#x6CD5;&#x7279;&#x70B9;&#x8FDB;&#x884C;&#x53D8;&#x6362;&#x3002;</p>
+<a id="more"></a>
+<p>&#x5728; NLP &#x4E2D;&#xFF0C;&#x8BCD;&#x7C7B;&#x6807;&#x6CE8;&#xFF08;Part-of-speech Tagging, POS&#xFF09;&#x4E5F;&#x8DDF; Parsing &#x6709;&#x5173;&#x7CFB;&#x3002;POS &#x53EF;&#x4EE5;&#x4F5C;&#x4E3A; Parsing &#x7684;&#x9884;&#x5904;&#x7406;&#xFF0C;&#x56E0;&#x4E3A;&#x5728;&#x6211;&#x4EEC;&#x901A;&#x8FC7; tagging &#x786E;&#x5B9A;&#x4E86;&#x6BCF;&#x4E2A;&#x8BCD;&#x8BED;&#x7684;&#x8BCD;&#x6027;&#x65F6;&#xFF0C;&#x540E;&#x7EED;&#x7684; Parsing &#x89C4;&#x5219;&#x5C31;&#x53EF;&#x4EE5;&#x5F97;&#x5230;&#x7B80;&#x5316;&#x3002;&#x4E0D;&#x8FC7;&#x7531;&#x4E8E; tagging &#x4E5F;&#x4F1A;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF0C;&#x6240;&#x4EE5;&#x52A0;&#x4E86;&#x6548;&#x679C;&#x4E0D;&#x4E00;&#x5B9A;&#x66F4;&#x597D;&#x3002;</p>
+<p><a href="http://www.cs.columbia.edu/~mcollins/courses/nlp2011/notes/pcfgs.pdf" title="PCFG" target="_blank" rel="external">PCFG</a>&#x662F;&#x4E00;&#x79CD;&#x57FA;&#x4E8E;&#x7EDF;&#x8BA1;&#x3001;&#x89C4;&#x5219;&#x7684;&#x6C42;&#x89E3; Parsing &#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x5F53;&#x7136;&#x8BE5;&#x65B9;&#x6CD5;&#x5DF2;&#x7ECF;&#x5F88;&#x65E9;&#x4E86;&#xFF0C;&#x53EA;&#x80FD;&#x4F5C;&#x4E3A; baseline&#xFF0C;&#x4E0D;&#x8FC7;&#x73B0;&#x5728;&#x5F88;&#x591A;&#x7684;&#x65B9;&#x6CD5;&#x548C;&#x6A21;&#x578B;&#x8FD8;&#x662F;&#x4EE5;&#x6B64;&#x4E3A;&#x57FA;&#x7840;&#x3002;&#x8BBE;&#x6709;&#x5143;&#x7EC4;</p>
+<span>$G = \left( N, \Sigma, S, R, q\right)$</span><!-- Has MathJax -->
+<p>&#x5176;&#x4E2D;&#xFF0C;$N$ &#x4E3A;&#x975E;&#x53F6;&#x7ED3;&#x70B9;&#xFF08;non-terminals&#xFF09;&#xFF0C;$\Sigma$ &#x4E3A; Parsing tree &#x7684;&#x53F6;&#x7ED3;&#x70B9;&#xFF08;vocabulary&#xFF09;&#xFF0C;$R$ &#x4E3A;&#x89C4;&#x5219;&#xFF08;rule&#xFF09;&#xFF0C;$q$ &#x4E3A;&#x89C4;&#x5219;&#x7684;&#x53C2;&#x6570;&#xFF08;parameter&#xFF09;&#x3002;&#x5728;&#x672C;&#x9898;&#x4E2D;&#xFF0C;$R$ &#x662F;&#x6EE1;&#x8DB3; Chomsky Normal Form&#xFF08;<a href="http://en.wikipedia.org/wiki/Chomsky_normal_form" title="CNF" target="_blank" rel="external">CNF</a>&#xFF09;&#x7684;&#xFF0C;&#x5373;&#x53EA;&#x6709;&#x4EE5;&#x4E0B;&#x4E24;&#x79CD;&#x5F62;&#x5F0F;&#xFF1A;</p>
+<span>$$\begin{eqnarray*}
+&amp;&amp; X \to Y_1Y_2, &#x5176;&#x4E2D;X \in N, Y_1 \in N, Y_2 \in N \\
+&amp;&amp; X \to Y, &#x5176;&#x4E2D;X \in N, Y \in \Sigma
+\end{eqnarray*}$$</span><!-- Has MathJax -->
+<h3 id="Part-1-20-points"><a href="#Part-1-20-points" class="headerlink" title="Part 1 (20 points)"></a>Part 1 (20 points)</h3><p>&#x8BE5;&#x6B65;&#x9AA4;&#x8DDF;&#x4E0A;&#x6B21;&#x7684; HMM tagger &#x9884;&#x5904;&#x7406;&#x4E00;&#x6837;&#xFF0C;&#x628A;&#x8BAD;&#x7EC3;&#x96C6;&#x4E2D;&#x7684;&#x8BCD;&#x6C47;&#x5206;&#x6210;&#x4E24;&#x79CD;&#xFF1A;&#x51FA;&#x73B0;&#x9891;&#x7387; &lt;5 &#x7684;&#x4E3A; <code>RARE</code>&#xFF0C;&#x5426;&#x5219;&#x4E3A; <code>non-RARE</code>&#xFF0C;&#x8BE5;&#x6B65;&#x9AA4;&#x4E5F;&#x53EF;&#x4EE5;&#x7406;&#x89E3;&#x6210;&#x662F;&#x4E00;&#x4E2A;&#x5E73;&#x6ED1;&#x64CD;&#x4F5C;&#x3002;</p>
+<p><a href="https://gist.github.com/ctLiu3/5317639#file-gistfile1-py" title="A2P2" target="_blank">[code]</a></p>
+<h3 id="Part-2-40-points"><a href="#Part-2-40-points" class="headerlink" title="Part 2 (40 points)"></a>Part 2 (40 points)</h3><p>&#x5F97;&#x5230; Parsing tree &#x7684;&#x8FC7;&#x7A0B;&#x7528;&#x7684;&#x662F;<a href="http://en.wikipedia.org/wiki/CYK_algorithm" title="CKY Algorithm" target="_blank" rel="external">CKY&#x7B97;&#x6CD5;</a>&#xFF0C;&#x5176;&#x5B9E;&#x5C31;&#x662F;&#x4E2A; bottom-up &#x7684; 3 &#x7EF4;DP&#x3002;DP(i,j,X) &#x8868;&#x793A;&#x5F85;&#x5206;&#x6790;&#x53E5;&#x5B50;&#x7684;&#x7B2C; i &#x4E2A;&#x5355;&#x8BCD;&#x5230;&#x7B2C; j &#x4E2A;&#x5355;&#x8BCD;&#xFF0C;&#x89C4;&#x5219;&#x7684; left-hand side &#x4E3A; X &#x7684;&#x6982;&#x7387;&#x6700;&#x5927;&#x503C;&#x3002;&#x76EE;&#x6807;&#x72B6;&#x6001;&#x4E3A; DP(1,n,&#x201D;SBARQ&#x201D;)&#xFF0C;&#x201D;SBARQ&#x201D; &#x4E3A;&#x9898;&#x76EE;&#x6307;&#x5B9A;&#x7684;&#x503C;&#xFF0C;&#x5F53;&#x7136;&#x81EA;&#x5DF1;&#x53BB;&#x904D;&#x5386;&#x6240;&#x6709;&#x7684; symbol &#x4E5F;&#x662F;&#x53EF;&#x4EE5;&#x7684;&#x3002;&#x72B6;&#x6001;&#x8F6C;&#x79FB;&#x65B9;&#x7A0B;&#x4E3A;&#xFF1A;</p>
+<span>$DP(i,j,X) = max\{P(X \to Y \ Z) \times DP(i,s,Y) \times DP(s+1,j,Z) \}$</span><!-- Has MathJax -->
+<p>&#x51E0;&#x4E2A;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x5751;&#xFF1A;</p>
+<p>1 &#x521D;&#x59CB;&#x5316;&#x3002;&#x521D;&#x59CB;&#x7684;&#x90E8;&#x5206;&#x662F; Parsing tree &#x7684;&#x53F6;&#x7ED3;&#x70B9;&#x3002;&#x5728; Part 1 &#x4E2D;&#x6211;&#x4EEC;&#x5DF2;&#x7ECF;&#x5C06;&#x8BAD;&#x7EC3;&#x96C6;&#x5206;&#x6210;&#x4E24;&#x7C7B;&#xFF1A;RARE &#x548C; non-RARE&#x3002;&#x8BE5;&#x521D;&#x59CB;&#x5316;&#x5FC5;&#x987B;&#x9075;&#x5B88;&#x4EE5;&#x4E0B;&#x6B65;&#x9AA4;&#xFF1A;</p>
+<ul>
+<li>&#x5982;&#x679C; P(X-&gt;Xi) &#x5728; <code>parse_train.counts.out</code> &#x51FA;&#x73B0;&#x8FC7;&#xFF0C;&#x5373;&#x8BF4;&#x660E; Xi &#x4E0D;&#x662F; <code>RARE</code>&#xFF0C;&#x90A3;&#x4E48;&#x76F4;&#x63A5;&#x8D4B;&#x503C; P(X-&gt;Xi)&#xFF1B;</li>
+<li>&#x5426;&#x5219;&#x5982;&#x679C; Xi &#x6CA1;&#x6709;&#x51FA;&#x73B0;&#x5728; <code>parse_train.counts.out</code> &#x5E76;&#x4E14; P(X-&gt;<code>RARE</code>) &#x5B58;&#x5728;&#xFF0C;&#x90A3;&#x4E48;&#x8D4B;&#x503C; P(X-&gt;<code>RARE</code>)&#xFF1B;</li>
+<li>&#x5426;&#x5219;&#xFF0C;&#x8D4B;&#x503C;&#x4E3A; 0&#x3002;</li>
+</ul>
+<p>&#x56E0;&#x4E3A;&#x6982;&#x7387;&#x76F8;&#x4E58;&#x4F1A;&#x5BFC;&#x81F4;&#x8FC7;&#x5C0F;&#x7684;&#x503C;&#xFF0C;&#x53EF;&#x4EE5;&#x7528; log &#x8F6C;&#x5316;&#xFF0C;&#x5F53;&#x7136;&#x672C;&#x9898;&#x4E0D;&#x8F6C;&#x4E5F;&#x53EF;&#x4EE5;&#x3002;</p>
+<p>2 &#x7ED3;&#x679C;&#x8F93;&#x51FA;&#x3002;&#x6309;&#x9898;&#x76EE;&#x8981;&#x6C42;&#xFF0C;&#x6C42;&#x89E3;&#x5F97;&#x5230;&#x7684; Parsing tree &#x662F;&#x7528; <code>json</code> &#x6765;&#x89E3;&#x6790;&#x7684;&#xFF0C;&#x6BD4;&#x5982;&#x4EE5;&#x4E0B;&#x662F;&#x4E00;&#x4E2A;&#x8F93;&#x51FA;&#x7ED3;&#x679C;&#xFF1A;</p>
+<pre>
+[&quot;SBARQ&quot;, [&quot;WHNP+PRON&quot;, &quot;What&quot;], [&quot;SBARQ&quot;, [&quot;SQ&quot;, [&quot;VERB&quot;, &quot;are&quot;], [&quot;NP+NOUN&quot;, &quot;geckos&quot;]], [&quot;.&quot;, &quot;?&quot;]]]
+</pre>
+
+<p>&#x5982;&#x679C;&#x662F;&#x7528; python &#x76F4;&#x63A5; <code>print</code> &#x7684;&#x8BDD;&#xFF0C;&#x5B57;&#x7B26;&#x4E32;&#x662F;&#x4EE5;&#x5355;&#x5F15;&#x53F7;&#x5F62;&#x5F0F;&#x51FA;&#x73B0;&#x7684;&#xFF0C;&#x76F4;&#x63A5;&#x7528; json &#x89E3;&#x6790;&#x4F1A;&#x51FA;&#x9519;&#x3002;&#x5728; VIM &#x4E0B;&#x53EF;&#x4EE5;&#x7528;&#x5168;&#x5C40;&#x66FF;&#x6362;&#x547D;&#x4EE4;&#x8FDB;&#x884C;&#x66FF;&#x6362;&#xFF1A;<code>%s/&apos;/&quot;/g</code>&#x3002;</p>
+<p><a href="https://gist.github.com/ctLiu3/5317639#file-gistfile2-py" title="A2P3" target="_blank">[code]</a></p>
+<h3 id="Part-3-1-point"><a href="#Part-3-1-point" class="headerlink" title="Part 3 (1 point)"></a>Part 3 (1 point)</h3><p>&#x8BE5;&#x90E8;&#x5206;&#x53EA;&#x662F;&#x5728; Part 2 &#x7684;&#x57FA;&#x7840;&#x4E0A;&#xFF0C;&#x5728; Parsing tree &#x7684;&#x6BCF;&#x4E2A;&#x7ED3;&#x70B9;&#x4E0A;&#x52A0;&#x5165;&#x4E86; <code>parent</code> &#x4FE1;&#x606F;&#x3002;&#x56E0;&#x4E3A;&#x5BF9;&#x4E8E;&#x539F;&#x59CB;&#x7684; PCFG &#x6765;&#x8BF4;&#xFF1A;Independence assumption is too strong! &#x7531;&#x4E8E;&#x8BE5;&#x4FE1;&#x606F;&#x6570;&#x636E;&#x5DF2;&#x7ECF;&#x7ED9;&#x51FA;&#xFF0C;&#x6240;&#x4EE5;&#x6C42;&#x89E3;&#x8FC7;&#x7A0B;&#x8DDF; Part 2 &#x5DEE;&#x4E0D;&#x591A;&#x3002;&#x53EA;&#x4E0D;&#x8FC7;&#x8FD9;&#x65F6;&#x7684; non-terminal &#x6570;&#x636E;&#x91CF;&#x4F1A;&#x589E;&#x52A0;&#xFF0C;&#x590D;&#x6742;&#x5EA6;&#x4F1A;&#x9AD8;&#x4E9B;&#x3002;&#x5982;&#x679C;&#x4F60; Part 2 &#x7684;&#x4EE3;&#x7801;&#x5DF2;&#x7ECF;&#x662F;&#x6BD4;&#x8F83;&#x4F18;&#x5316;&#x7684;&#xFF0C;&#x8DD1; Part 3 &#x7684;&#x6570;&#x636E;&#x4E5F;&#x4E0D;&#x4F1A;&#x6162;&#x591A;&#x5C11;&#x3002;</p>
+<h3 id="Weakness-of-PCFG"><a href="#Weakness-of-PCFG" class="headerlink" title="Weakness of PCFG"></a>Weakness of PCFG</h3><p>&#x4F5C;&#x4E3A;&#x4E00;&#x4E2A;&#x6559;&#x79D1;&#x4E66;&#x4E0A;&#x7684;&#x7B97;&#x6CD5;&#xFF0C;PCGF &#x52A3;&#x52BF; &gt;=2&#xFF1A;</p>
+<p>1 &#x6CA1;&#x6709;&#x5145;&#x5206;&#x5229;&#x7528;&#x53E5;&#x4E2D;&#x5355;&#x8BCD;&#x5E26;&#x6765;&#x7684;&#x4FE1;&#x606F;&#x91CF;&#x3002;&#x7B97;&#x6CD5;&#x8FC7;&#x7A0B;&#x4E2D;&#x53EA;&#x6709;&#x5728;&#x6C42;&#x89E3; $P(X \to X_i)$ &#x7528;&#x5230;&#x4E86;&#x5355;&#x8BCD;&#x7684;&#x4FE1;&#x606F;&#xFF0C;&#x800C;&#x8BE5;&#x4FE1;&#x606F;&#x6CA1;&#x6709;&#x4F5C;&#x7528;&#x5230;&#x5168;&#x5C40;&#x4E0A;&#x3002;</p>
+<p>2 &#x6CA1;&#x6709;&#x5145;&#x5206;&#x5229;&#x7528;&#x53E5;&#x5B50;&#x7684;&#x7ED3;&#x6784;&#x4FE1;&#x606F;&#x3002;&#x540C;&#x6837;&#x7684; rule&#xFF0C;&#x540C;&#x6837;&#x7684; probability value&#xFF0C;&#x53EF;&#x80FD;&#x5BFC;&#x81F4;&#x4E0D;&#x540C;&#x7684; Parsing tree&#x3002;</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/coursera/">coursera</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nlp/">nlp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prasing/">prasing</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/08/08/tips-you-should-know-about-caffe/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Tips you should know about Caffe
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/03/24/nlp-pa-hidden-markov-models/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">NLP PA: Hidden Markov Models&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 ctliu3&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+<script>
+  var disqus_shortname = 'ctliu3';
+  
+  var disqus_url = 'http://ctliu3.com/2013/04/05/nlp-pa-parsing/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

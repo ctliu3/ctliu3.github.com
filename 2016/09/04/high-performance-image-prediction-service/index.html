@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Build a high performance image prediction service - ct.Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&amp;#x2019;ve  spe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Build a high performance image prediction service">
+<meta property="og:url" content="http://ctliu3.com/2016/09/04/high-performance-image-prediction-service/index.html">
+<meta property="og:site_name" content="ct.Liu">
+<meta property="og:description" content="Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&amp;#x2019;ve  spe">
+<meta property="og:image" content="http://ctliu3.com/2016/09/04/high-performance-image-prediction-service/prediction-flow.png">
+<meta property="og:updated_time" content="2016-09-04T15:26:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Build a high performance image prediction service">
+<meta name="twitter:description" content="Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&amp;#x2019;ve  spe">
+<meta name="twitter:image" content="http://ctliu3.com/2016/09/04/high-performance-image-prediction-service/prediction-flow.png">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+</head>
+
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ctliu3.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-high-performance-image-prediction-service" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Build a high performance image prediction service
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/09/04/high-performance-image-prediction-service/" class="article-date">
+  <time datetime="2016-09-04T14:36:00.000Z" itemprop="datePublished">2016-09-04</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Deep learning is absolutely one of the keywords in these years. Like many other company, we use deep learning to solve some tasks, like image classification, OCR, face detection, etc. I&#x2019;ve  spent some time building the image classification service and done some optimizations during my work.  I will share some of my experience in this article.</p>
+<a id="more"></a>
+<h3 id="CPU-or-GPU"><a href="#CPU-or-GPU" class="headerlink" title="CPU or GPU"></a>CPU or GPU</h3><p>It really depends on a variety of factors, such as the request scale, power consumption, etc. GPU is expensive, but running the forward phase on the GPU device has dozens of times speed-up than CPU even you use OpenBLAS or MKL to accelerate the underlying matrix manipulation in CPU.</p>
+<h3 id="Prediction-Model-design"><a href="#Prediction-Model-design" class="headerlink" title="Prediction Model design"></a>Prediction Model design</h3><p>In general case, people will try to predict the image category using convolutional neural networks (CNN), like AlexNet, GoogleNet, or VGGNet. Different networks has different prediction performance and time complexity in inference phase. For example, executing forward stage in AlexNet is 4 times faster than GoogleNet. But GoogleNet has better classification ability since it&#x2019;s deeper and wider. Directly training the pre-trained model on the ImageNet or some other open database might not meet your need for precision and recall. To gain a higher precision and recall, there are many approaches worth to try: re-design the network, use the cascaded model, integrate the outputs of multi-network, predict with multiple scales. All these strategies are doable and sound great. But remember, these designs might more or less increase the time and GPU memory cost. So, take the time and space complexity into account while designing the neural network models.</p>
+<h3 id="Prediction-Frameworks"><a href="#Prediction-Frameworks" class="headerlink" title="Prediction Frameworks"></a>Prediction Frameworks</h3><p>Building an neural network prediction framework from scratch of you own might not a smart idea since there are some well-built projects such as Caffe, MXNet and TensorFlow, which can be deployed directly in the production environment. Take following pros and cons into account before choosing one.</p>
+<ul>
+<li>Caffe. Maybe this is the most popular framework that people are familiar with, which means you can find lots of solutions for the problem you encounter on the Internet. Caffe has graceful C++ and python API. The cons is that it occupies too much GPU memory when comparing with MXNet and TensorFlow. This is the design issue. Caffe will allocate the memory for parameters and output of each layer and these memory can not be reused. For GoogleNet model, Caffe allocates 6x GPU memory than MXNet. The good news is that if you want to load multiple identical models on the same process, you can share the parameters of each layer.</li>
+<li>MXNet. A deep learning that has a better design of GPU memory allocation. It constructs the neural network as a computation graph. Each node in the graph can be reuse and it has high performance since the computation is not executed layer-by-layer, but based on the node (a node is a computation unit like add, minus, multiply and divide). Concretely, a node can be executed if its preceding nodes are finished. Like Caffe, MXNet also has graceful C++ and python API. The bad news is MXNet has worse performance when running on CPU. Take a look of this issue.</li>
+<li>TensorFlow. The GPU memory usage and performance are close to MXNet. I don&#x2019;t have experience on TensorFlow on production environment. The official team provides a project, called serving, to help deploy deep learning models.</li>
+</ul>
+<h3 id="Single-or-Batch-prediction"><a href="#Single-or-Batch-prediction" class="headerlink" title="Single or Batch prediction"></a>Single or Batch prediction</h3><p>Running a GoogleNet V1 in forward (with cuDNN) with the batch size of 10 is only~30% time of running batch size of 1 in 10 times. This conclusion provides us a way to improve the service performance. We can add a middleware to serve the request from client and forward them to prediction service. There are some features for the middleware showing as followings:</p>
+<ul>
+<li>Request coalescing duration. The middleware needs to forward the batched images within a limited period of time even the requested imaged to be predicted is smaller than the batch size. If not, it brings high-latency. </li>
+<li>Batch size. In general, the throughput of the prediction system will be enhanced if batch size increased. But too larger a batch size leads to high GPU memory occupation and service latency.</li>
+<li>Rate limiting. The middleware can limit the number of request to fit the service limitation of prediction service.</li>
+</ul>
+<p>Following figure a flexible and extensible architecture.</p>
+<img src="/2016/09/04/high-performance-image-prediction-service/prediction-flow.png" class="full-image" width="350" height="680" title="prediction-flow">
+<h3 id="Image-decode-optimization"><a href="#Image-decode-optimization" class="headerlink" title="Image decode optimization"></a>Image decode optimization</h3><p>Decode a 1080P image will cost ~30ms in CPU while running inference of GoogleNet V1 only cost ~10ms in GPU. Thus, decoding image may somehow become bottleneck. To solve this, It&#x2019;s better to resize the image in front end. In addition, decoding image with in libjpeg-turbo library ~30% faster than libjpeg (I got this result but the official site claims that better performance can be achieved).</p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>The strategies above mentioned are not only suitable for image prediction service, but also for face recognition, face detection, etc.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/08/08/tips-you-should-know-about-caffe/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Tips you should know about Caffe&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 ctliu3&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+<script>
+  var disqus_shortname = 'ctliu3';
+  
+  var disqus_url = 'http://ctliu3.com/2016/09/04/high-performance-image-prediction-service/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
