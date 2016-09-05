@@ -30,6 +30,8 @@ Running a GoogleNet V1 in forward (with cuDNN) with the batch size of 10 is only
 
 Following figure a flexible and extensible architecture.
 
+{% img full-image /high-performance-image-prediction-service/prediction-flow.png 350 680 prediction-flow %}
+
 ### Image decode optimization
 Decode a 1080P image will cost ~30ms in CPU while running inference of GoogleNet V1 only cost ~10ms in GPU. Thus, decoding image may somehow become bottleneck. To solve this, It’s better to resize the image in front end. In addition, decoding image with in libjpeg-turbo library ~30% faster than libjpeg (I got this result but the official site claims that better performance can be achieved).
 

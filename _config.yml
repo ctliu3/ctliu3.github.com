@@ -73,6 +73,14 @@ deploy:
   repository: git@github.com:ctLiu3/ctliu3.github.com.git
   branch: master
 
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
+
+disqus_shortname: ctliu3
+
 # # Plugins
 # plugins:
  # - hexo-math
