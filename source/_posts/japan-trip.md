@@ -1,7 +1,8 @@
 ---
 title: 日本之行
 date: 2016-09-16 18:20:31
-tags:
+categories: Life
+tags: [japan, travel]
 ---
 
 {% img full-image /japan-trip/Ginza.JPG 800 200 '""' '"夜晚的银座"'%}
