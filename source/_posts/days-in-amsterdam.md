@@ -1,5 +1,5 @@
 ---
-title: 在阿姆斯特丹的几天里
+title: 阿姆斯特丹之行
 date: 2016-10-16 23:23:37
 categories: Life
 tags: [amsterdam, travel]
