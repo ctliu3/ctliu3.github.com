@@ -43,19 +43,19 @@ dist-lr 是我基于 ps-lite 写的一个分布式 logistic regression 的项目
 
 |  | elapsed | accuracy |
 | ------------- |:-------------:| :-----:|
-| sync | 108s | 82.7% |
-| async | 70s | 71.1% |
+| sync | 92s | 82.9% |
+| async | 69s | 80.4% |
 
 同步训练时，准确率是一直上升的，而异步时，准确率会有比较大的振荡，无法很好的收敛。下面是某一次异步训练时的收敛情况：
 
-	19:16:08 Iteration   0, accuracy: 0.726061
-	19:16:16 Iteration  20, accuracy: 0.832258
-	19:16:23 Iteration  40, accuracy: 0.832934
-	19:16:31 Iteration  60, accuracy: 0.840182
-	19:16:39 Iteration  80, accuracy: 0.796634
-	19:16:47 Iteration 100, accuracy: 0.847491
-	19:16:55 Iteration 120, accuracy: 0.668509
-	19:17: 3 Iteration 140, accuracy: 0.793133
-	19:17:10 Iteration 160, accuracy: 0.848965
-	19:17:18 Iteration 180, accuracy: 0.711013
+	 09:51:38 Iteration  20, accuracy: 0.690682
+	 09:51:46 Iteration  40, accuracy: 0.725201
+	 09:51:53 Iteration  60, accuracy: 0.845955
+	 09:52:01 Iteration  80, accuracy: 0.790861
+	 09:52:08 Iteration 100, accuracy: 0.819114
+	 09:52:16 Iteration 120, accuracy: 0.776856
+	 09:52:24 Iteration 140, accuracy: 0.773847
+	 09:52:31 Iteration 160, accuracy: 0.811498
+	 09:52:39 Iteration 180, accuracy: 0.836619
+	 09:52:47 Iteration 200, accuracy: 0.804312
 
