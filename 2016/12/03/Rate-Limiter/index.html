@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Rate Limiter - ct.Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="I dig into rate limiter these days. Rate limiter is a tool that limits the number of request in a given short period. Any service only can handle limited requests with limited resources (cpu, memory,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rate Limiter">
+<meta property="og:url" content="http://ctliu3.com/2016/12/03/Rate-Limiter/index.html">
+<meta property="og:site_name" content="ct.Liu">
+<meta property="og:description" content="I dig into rate limiter these days. Rate limiter is a tool that limits the number of request in a given short period. Any service only can handle limited requests with limited resources (cpu, memory,">
+<meta property="og:updated_time" content="2016-12-03T09:12:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Rate Limiter">
+<meta name="twitter:description" content="I dig into rate limiter these days. Rate limiter is a tool that limits the number of request in a given short period. Any service only can handle limited requests with limited resources (cpu, memory,">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+</head>
+
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ctliu3.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-Rate-Limiter" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Rate Limiter
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/12/03/Rate-Limiter/" class="article-date">
+  <time datetime="2016-12-03T02:52:19.000Z" itemprop="datePublished">2016-12-03</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Engineering/">Engineering</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>I dig into rate limiter these days. Rate limiter is a tool that limits the number of request in a given short period. Any service only can handle limited requests with limited resources (cpu, memory, etc). Rate limiter prevents service to reach a high load that beyond its load capacity.</p>
+<a id="more"></a>
+<p>Generally, rate limiter can be implemented using leaky bucket or token bucket algorithms. The main difference between them is the rate accepting a request. The word &#x201C;bucket&#x201D; is really imagery word that can help you catch the idea of the algorithms.</p>
+<p>For leaky bucket algorithm, the time gap between any two adjacent requests should be greater than a fixed value. Therefore, if there comes huge requests in a short period, the requests will through the service one by one, no burstiness happens. However, the burstiness occurs in token bucket algorithm. Before passing the limiter, request should check if there is enough tokens left. If there is, then the request is accepted. The tokens will be refilled in a given period. If many requests get the tokens at almost the same time, then burstiness takes place.</p>
+<p>For a full-featured rate limiter, following points should be considered:</p>
+<ul>
+<li>Multiple request at a time. The requests are packed into batch, they should be handled simultaneously.</li>
+<li>Multiple buckets. Each bucket is used for a namespace, such as user id or host.</li>
+<li>Heterogeneous request type. You need different limiter to handle different type of requests.</li>
+<li>Dynamic configuration. Reconfigure the limiter without restarting it.</li>
+<li>Make it distributed. Multiple same service use a central limiter. But this will make the limiter a little bit heavy and I don&#x2019;t recommend this in some degree.</li>
+<li>etc&#x2026;</li>
+</ul>
+<p>In <a href="https://github.com/ctliu3/tap" target="_blank" rel="external">tap</a>, which is a project in github, I implement the above two algorithms of rate limiter using golang. Also, I also extend the rate limiter to a distributed version, backend with redis. This project is a good start to understand rate limiter, but it&#x2019;s still an experimental project, be careful if you want to use it in production environment. I don&#x2019;t suppose to get into details about the tap because it&#x2019;s not completed finished, you can take a glance on the codes.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rate-limiter/">rate-limiter</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/11/12/parameter-server/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">参数服务器&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 ctliu3&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+<script>
+  var disqus_shortname = 'ctliu3';
+  
+  var disqus_url = 'http://ctliu3.com/2016/12/03/Rate-Limiter/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

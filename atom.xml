@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://ctliu3.com/"/>
-  <updated>2016-11-13T01:56:15.000Z</updated>
+  <updated>2016-12-03T09:12:09.000Z</updated>
   <id>http://ctliu3.com/</id>
   
   <author>
@@ -14,6 +14,42 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Rate Limiter</title>
+    <link href="http://ctliu3.com/2016/12/03/Rate-Limiter/"/>
+    <id>http://ctliu3.com/2016/12/03/Rate-Limiter/</id>
+    <published>2016-12-03T02:52:19.000Z</published>
+    <updated>2016-12-03T09:12:09.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>I dig into rate limiter these days. Rate limiter is a tool that limits the number of request in a given short period. Any service only can handle limited requests with limited resources (cpu, memory, etc). Rate limiter prevents service to reach a high load that beyond its load capacity.</p>
+<a id="more"></a>
+<p>Generally, rate limiter can be implemented using leaky bucket or token bucket algorithms. The main difference between them is the rate accepting a request. The word &#x201C;bucket&#x201D; is really imagery word that can help you catch the idea of the algorithms.</p>
+<p>For leaky bucket algorithm, the time gap between any two adjacent requests should be greater than a fixed value. Therefore, if there comes huge requests in a short period, the requests will through the service one by one, no burstiness happens. However, the burstiness occurs in token bucket algorithm. Before passing the limiter, request should check if there is enough tokens left. If there is, then the request is accepted. The tokens will be refilled in a given period. If many requests get the tokens at almost the same time, then burstiness takes place.</p>
+<p>For a full-featured rate limiter, following points should be considered:</p>
+<ul>
+<li>Multiple request at a time. The requests are packed into batch, they should be handled simultaneously.</li>
+<li>Multiple buckets. Each bucket is used for a namespace, such as user id or host.</li>
+<li>Heterogeneous request type. You need different limiter to handle different type of requests.</li>
+<li>Dynamic configuration. Reconfigure the limiter without restarting it.</li>
+<li>Make it distributed. Multiple same service use a central limiter. But this will make the limiter a little bit heavy and I don&#x2019;t recommend this in some degree.</li>
+<li>etc&#x2026;</li>
+</ul>
+<p>In <a href="https://github.com/ctliu3/tap" target="_blank" rel="external">tap</a>, which is a project in github, I implement the above two algorithms of rate limiter using golang. Also, I also extend the rate limiter to a distributed version, backend with redis. This project is a good start to understand rate limiter, but it&#x2019;s still an experimental project, be careful if you want to use it in production environment. I don&#x2019;t suppose to get into details about the tap because it&#x2019;s not completed finished, you can take a glance on the codes.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;I dig into rate limiter these days. Rate limiter is a tool that limits the number of request in a given short period. Any service only can handle limited requests with limited resources (cpu, memory, etc). Rate limiter prevents service to reach a high load that beyond its load capacity.&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Engineering" scheme="http://ctliu3.com/categories/Engineering/"/>
+    
+    
+      <category term="rate-limiter" scheme="http://ctliu3.com/tags/rate-limiter/"/>
+    
+  </entry>
   
   <entry>
     <title>参数服务器</title>
