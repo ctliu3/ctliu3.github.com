@@ -1,0 +1,3 @@
+[submodule "themes/minos"]
+	path = themes/minos
+	url = https://github.com/ctliu3/hexo-theme-minos.git
