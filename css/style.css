@@ -114,11 +114,12 @@ body,
 }
 body {
   background: #fff;
+  color: #333;
   font: 16px 'PT Serif', 'STZhongsong', '华文中宋', 'Microsoft Yahei', serif;
   -webkit-text-size-adjust: 100%;
 }
 .outer {
-  max-width: 800px;
+  max-width: 750px;
   margin: 0 auto;
 }
 .outer:before,
@@ -182,7 +183,7 @@ a.article-title,
 .article-entry .gist .gist-file .gist-meta a,
 .layout-wrap-inner .category-list a,
 .tag-cloud a {
-  color: #111;
+  color: #444;
   text-decoration: none;
   border-bottom: 1px dotted transparent;
 }
@@ -258,7 +259,7 @@ a.article-title:hover,
 .article-entry ol,
 .article-entry dl {
   margin: 0 20px;
-  line-height: 1.4em;
+  line-height: 1.6em;
 }
 .article-entry ul ul,
 .article-entry ol ul,
@@ -382,7 +383,7 @@ a.article-title:hover,
   float: left;
   font-size: 14px;
   background: none;
-  color: #111;
+  color: #444;
   outline: none;
 }
 .search-form-input::-webkit-search-results-decoration,
@@ -452,8 +453,11 @@ a.article-title:hover,
   font-weight: 700;
   line-height: 1em;
 }
+a.article-title {
+  color: #333;
+}
 .article-entry {
-  color: #111;
+  color: #444;
   padding: 0;
 }
 .article-entry:before,
@@ -466,8 +470,8 @@ a.article-title:hover,
 }
 .article-entry p,
 .article-entry table {
-  line-height: 1.4em;
-  margin: 1.4em 0;
+  line-height: 1.6em;
+  margin: 1.6em 0;
 }
 .article-entry h1,
 .article-entry h2,
@@ -482,8 +486,8 @@ a.article-title:hover,
 .article-entry ul,
 .article-entry ol,
 .article-entry dl {
-  margin-top: 1.4em;
-  margin-bottom: 1.4em;
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
 }
 .article-entry img,
 .article-entry video {
@@ -512,12 +516,12 @@ a.article-title:hover,
 .article-entry blockquote {
   font-family: 'PT Serif', 'STZhongsong', '华文中宋', 'Microsoft Yahei', serif;
   font-size: 1.4em;
-  margin: 1.4em 20px;
+  margin: 1.6em 20px;
   text-align: center;
 }
 .article-entry blockquote footer {
   font-size: 16px;
-  margin: 1.4em 0;
+  margin: 1.6em 0;
   font-family: font-sans;
 }
 .article-entry blockquote footer cite:before {
@@ -567,8 +571,8 @@ a.article-title:hover,
 }
 .article-footer {
   font-size: 0.85em;
-  padding: 1.4em 0;
-  line-height: 1.4em;
+  padding: 1.6em 0;
+  line-height: 1.6em;
   margin: 0;
 }
 .article-footer:before,
@@ -584,7 +588,7 @@ a.article-title:hover,
   text-decoration: none;
 }
 .article-footer a:hover {
-  color: #111;
+  color: #444;
 }
 .article-tag-list-item {
   float: left;
@@ -616,7 +620,7 @@ a.article-title:hover,
   display: block;
 }
 .article-nav-link-wrap:hover {
-  color: #111;
+  color: #444;
 }
 @media screen and (min-width: 840px) {
   .article-nav-link-wrap {
@@ -645,7 +649,7 @@ a.article-title:hover,
 }
 .article-nav-title {
   font-size: 0.85em;
-  line-height: 1.4em;
+  line-height: 1.6em;
   margin-top: 0.5em;
 }
 .article-gallery {
@@ -682,8 +686,8 @@ a.article-title:hover,
   margin-left: 400px;
   padding-left: 20px;
   overflow-y: auto;
-  line-height: 1.4em;
-  max-height: 40.32em;
+  line-height: 1.6em;
+  max-height: 46.080000000000005em;
 }
 .article-toc h3 {
   font-weight: bold;
@@ -801,7 +805,7 @@ a.article-title:hover,
   font-weight: 600;
 }
 #footer-info {
-  line-height: 1.4em;
+  line-height: 1.6em;
   font-size: 0.85em;
 }
 .article-entry pre,
@@ -812,7 +816,7 @@ a.article-title:hover,
   padding: 15px 0;
   overflow: auto;
   color: #fff;
-  line-height: 22.4px;
+  line-height: 25.6px;
 }
 .article-entry .highlight .gutter pre,
 .article-entry .gist .gist-file .gist-data .line-numbers {
@@ -872,7 +876,7 @@ a.article-title:hover,
   text-align: right;
 }
 .article-entry .highlight .line {
-  height: 22.4px;
+  height: 25.6px;
 }
 .article-entry .gist {
   margin: 0;
